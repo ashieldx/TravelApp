@@ -50,7 +50,7 @@ public class PostService {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm");
             postDetail.setFileName(currentTime.format(dateTimeFormatter) + 
                                 "_" + (postDetails.size()+1) + 
-                                "_" + postDetail.getFileType());
+                                "." + postDetail.getFileType());
             postDetail.setPost(post);
             postDetail.setCreatedDate(currentTime);
             postDetail.setUrl("/uploads/post-details/" + postDetail.getFileName());
