@@ -34,6 +34,9 @@ public class ClaimDetails {
     @Column(name = "original_file_name")
     private String originalFileName;
 
+    @Column(name = "file_type")
+    private String fileType;
+
     @Column(name = "url")
     private String url;
 

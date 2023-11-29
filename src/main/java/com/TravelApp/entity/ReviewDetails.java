@@ -16,8 +16,8 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "mst_post_details")
-public class PostDetails {  
+@Table(name = "mst_review_details")
+public class ReviewDetails {  
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,8 +25,8 @@ public class PostDetails {
     
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
+    @JoinColumn(name = "review_id", nullable = false)
+    private Review review;
 
     @Column(name = "renamed_file_name")
     private String fileName;

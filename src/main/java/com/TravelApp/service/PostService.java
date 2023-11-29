@@ -1,6 +1,7 @@
 package com.TravelApp.service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,11 +44,16 @@ public class PostService {
         List<PostDetails> postDetails = new ArrayList<>();
         Arrays.asList(files).stream().forEach(file-> {
             PostDetails postDetail = new PostDetails();
-            postDetail.setFileName(postDetails.size()+1 + "_" + post.getTitle() + "_" + file.getOriginalFilename());
             postDetail.setOriginalFileName(file.getOriginalFilename());
+            postDetail.setFileType(file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".")+1));
+
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm");
+            postDetail.setFileName(currentTime.format(dateTimeFormatter) + 
+                                "_" + (postDetails.size()+1) + 
+                                "_" + postDetail.getFileType());
             postDetail.setPost(post);
             postDetail.setCreatedDate(currentTime);
-            postDetail.setUrl("/uploads/post-details/"+postDetail.getFileName());
+            postDetail.setUrl("/uploads/post-details/" + postDetail.getFileName());
 
             fileService.save(file, postDetail);
             postDetails.add(postDetail);
@@ -147,4 +153,5 @@ public class PostService {
         }
         return "FAILED TO DELETE POST";
     }
+
 }
