@@ -1,5 +1,7 @@
 package com.TravelApp.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,11 +21,25 @@ public class FileService{
 
     private final Path postDetailRoot = Paths.get("uploads/post-details");
     private final Path claimDetailRoot = Paths.get("uploads/claim-details");
+    private final Path reviewDetailRoot = Paths.get("uploads/review-details");
+
+    public void initialize(Path root){
+        try{
+            File directory = new File(root.toUri());
+            boolean ifExist = directory.exists();
+            if(!ifExist){
+                Files.createDirectory(root);
+            }      
+        }catch (IOException e){
+            throw new RuntimeException("Trouble Creating Directory!");
+        }
+    }
 
     /*
     POST DETAILS 
     */
     public void save(MultipartFile file, PostDetails postDetails) {
+        initialize(postDetailRoot);
         try{
             Files.copy(file.getInputStream(), 
                 this.postDetailRoot.resolve(Objects.requireNonNull(postDetails.getFileName())));
@@ -58,6 +74,7 @@ public class FileService{
     CLAIM DETAILS
     */
      public void save(MultipartFile file, ClaimDetails claimDetails) {
+        initialize(claimDetailRoot);
         try{
             Files.copy(file.getInputStream(), 
                 this.claimDetailRoot.resolve(Objects.requireNonNull(claimDetails.getFileName())));
