@@ -1,7 +1,6 @@
 package com.TravelApp.service;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +14,7 @@ import com.TravelApp.entity.Review;
 import com.TravelApp.entity.ReviewDetails;
 import com.TravelApp.entity.User;
 import com.TravelApp.repository.LikeRepository;
+import com.TravelApp.repository.ReviewDetailRepository;
 import com.TravelApp.repository.ReviewRepository;
 import com.TravelApp.util.ErrorMessage;
 
@@ -27,6 +27,9 @@ public class ReviewService {
     private ReviewRepository reviewRepository;
 
     @Autowired
+    private ReviewDetailRepository reviewDetailRepository;
+
+    @Autowired
     private LikeRepository likeRepository;
 
     @Autowired
@@ -34,12 +37,13 @@ public class ReviewService {
 
     private static final String LIKE = "LIKE";
     private static final String DISLIKE = "DISLIKE";
+    private static final String FILE_URL = "uploads/review-details/";
     
     public Review postReview(User user, Integer postId, Review review, MultipartFile[] files) throws Exception{
 
-        if(reviewRepository.findByPostIdAndUsername(postId, user.getUsername()) != null){
-            throw new Exception("You Already Reviewed This Post");
-        }
+        // if(reviewRepository.findByPostIdAndUsername(postId, user.getUsername()) != null){
+        //     throw new Exception("You Already Reviewed This Post");
+        // }
         
         LocalDateTime currentTime = LocalDateTime.now();
         review.setCreatedDate(currentTime);
@@ -54,13 +58,10 @@ public class ReviewService {
             ReviewDetails reviewDetail = new ReviewDetails();
             reviewDetail.setOriginalFileName(file.getOriginalFilename());
             reviewDetail.setFileType(file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".")+1));
-            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm");
-            reviewDetail.setFileName(currentTime.format(dateTimeFormatter) + 
-                                "_" + (reviewDetails.size()+1) + 
-                                "." + reviewDetail.getFileType());
+            reviewDetail.setFileName(review.getPostId()+ "_R_" + review.getUsername() + "_" + reviewDetails.size() + "." + reviewDetail.getFileType());
             reviewDetail.setReview(review);
             reviewDetail.setCreatedDate(currentTime);
-            reviewDetail.setUrl("/uploads/review-details/");
+            reviewDetail.setUrl(FILE_URL);
 
             fileService.save(file, reviewDetail);
             reviewDetails.add(reviewDetail);
@@ -70,8 +71,44 @@ public class ReviewService {
         noticationService.createReviewNotification(user, postId);
         return reviewRepository.save(review);
     }
+    
+    public Review editReview(User user, Integer reviewId, Review newReview, MultipartFile[] files){
+        Review review = reviewRepository.findById(reviewId).get();
+        LocalDateTime currTime = LocalDateTime.now();
 
+        if(!review.getUsername().equals(user.getUsername())){
+            //cannot edit review
+            return review;
+        }
 
+        review.setEditFlag(true);
+        review.setDescription(newReview.getDescription());
+        review.setRating(newReview.getRating());
+
+        //remove old files
+        List<ReviewDetails> oldReviewDetails = reviewDetailRepository.findByReview(review);
+        for(ReviewDetails i : oldReviewDetails){
+            fileService.deleteFile(FILE_URL+i.getFileName());
+        }
+        reviewDetailRepository.deleteAll(oldReviewDetails);
+        
+        List<ReviewDetails> newReviewDetails = new ArrayList<>();
+        Arrays.asList(files).stream().forEach(file->{
+            ReviewDetails reviewDetail = new ReviewDetails();
+            reviewDetail.setOriginalFileName(file.getOriginalFilename());
+            reviewDetail.setFileType(file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".")+1));
+            reviewDetail.setFileName(review.getPostId()+ "_R_" + review.getUsername() + "_" + newReviewDetails.size() + "." + reviewDetail.getFileType());
+            reviewDetail.setReview(review);
+            reviewDetail.setCreatedDate(currTime);
+            reviewDetail.setUrl(FILE_URL);
+
+            fileService.save(file, reviewDetail);
+            newReviewDetails.add(reviewDetail);
+        });
+
+        review.setReviewDetails(newReviewDetails);
+        return reviewRepository.save(review);
+    }
 
     public Review likeReview(Integer userId, Integer reviewId){
         Like like = likeRepository.findByUserIdAndReviewId(userId, reviewId);
@@ -127,7 +164,7 @@ public class ReviewService {
         noticationService.deleteLikeNotification(userId, reviewId);
         Integer likeCount = likeRepository.getLikeOrDislikeCount(reviewId, LIKE);
         Integer dislikeCount = likeRepository.getLikeOrDislikeCount(reviewId, DISLIKE);
-        review.setLikes(likeCount);
+        review.setLikes(likeCount); 
         review.setDislikes(dislikeCount);
         review.setModifiedDate(LocalDateTime.now());
         return reviewRepository.save(review);
@@ -141,6 +178,11 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId).get();
     
         if(review.getUsername() == null || review.getUsername().equals(user.getUsername())){
+            List<ReviewDetails> reviewDetails = reviewDetailRepository.findByReview(review);
+            for(ReviewDetails i : reviewDetails){
+                fileService.deleteFile(FILE_URL+i.getFileName());
+            }
+            reviewDetailRepository.deleteAll(reviewDetails);
             reviewRepository.delete(review);
             return "Delete Successful";
         }
@@ -148,5 +190,7 @@ public class ReviewService {
             throw new ErrorMessage("Review Belongs To Another User");
         }
     }
+
+    
 
 }

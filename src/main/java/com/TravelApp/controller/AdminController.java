@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.TravelApp.entity.Category;
 import com.TravelApp.entity.Report;
 import com.TravelApp.service.CategoryService;
+import com.TravelApp.service.FileService;
 import com.TravelApp.service.PostService;
 import com.TravelApp.service.ReportService;
 import com.TravelApp.util.ErrorMessage;
@@ -30,6 +31,9 @@ public class AdminController {
 
     @Autowired
     private ReportService reportService;
+
+    @Autowired
+    private FileService fileService;
 
     //POST
     @DeleteMapping("/delete/{id}")
@@ -53,6 +57,13 @@ public class AdminController {
 
     //Send chat to user
 
+
+
+    //WARNING
+    @GetMapping("flush-all")
+    public void flushFiles(){
+        fileService.flushAllFiles();
+    }
 
 
 

@@ -37,6 +37,7 @@ public class PostDetails {
     @Column(name = "file_type")
     private String fileType;
 
+    @JsonIgnore
     @Column(name = "url")
     private String url;
 

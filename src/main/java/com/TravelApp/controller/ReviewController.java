@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +19,8 @@ import com.TravelApp.entity.User;
 import com.TravelApp.service.FileService;
 import com.TravelApp.service.ReviewService;
 import com.TravelApp.util.ErrorMessage;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
@@ -45,6 +48,16 @@ public class ReviewController {
         
         Review review = new ObjectMapper().readValue(reviewString, Review.class);
         return reviewService.postReview(user, postId, review, files);
+    }
+
+    @PutMapping("/edit/{id}")
+    public Review editPost(@AuthenticationPrincipal User user, @RequestParam("files") MultipartFile[] files,
+         @PathVariable("id") Integer id, @RequestParam("data") String reviewString) throws ErrorMessage, JsonMappingException, JsonProcessingException{
+        //validasi file
+        fileService.validateFiles(files);
+
+        Review review = new ObjectMapper().readValue(reviewString, Review.class);
+        return reviewService.editReview(user, id, review, files);
     }
 
     @GetMapping("/get/{id}")

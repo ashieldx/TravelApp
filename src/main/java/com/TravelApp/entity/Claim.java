@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,14 +26,17 @@ public class Claim {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "user_id")
-    private Integer userId;
+    @OneToOne
+    private User user;
 
-    @Column(name = "post_id")
-    private Integer postId;
+    @OneToOne
+    private Post post;
 
     @Column(name = "description")
     private String description;
+
+    @Column(name = "status")
+    private String status;
 
     @OneToMany(mappedBy = "claim", cascade = CascadeType.ALL)
     private List<ClaimDetails> claimDetails = new ArrayList<ClaimDetails>();

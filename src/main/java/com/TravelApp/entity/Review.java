@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,6 +45,10 @@ public class Review {
 
     @Column(name = "rating")
     private Float rating;
+
+    @Column(name = "edit_flag")
+    @ColumnDefault("false")
+    private boolean editFlag;
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
     private List<ReviewDetails> reviewDetails = new ArrayList<ReviewDetails>();

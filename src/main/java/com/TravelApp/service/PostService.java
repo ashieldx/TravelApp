@@ -1,7 +1,6 @@
 package com.TravelApp.service;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +34,7 @@ public class PostService {
     @Autowired
     private ReviewRepository reviewRepository;
 
-    public final static String FILE_URL = "uploads/post-details/";
+    private static final String FILE_URL = "uploads/post-details/";
 
     public Post savePost(User user, Post post, MultipartFile[] files) throws ErrorMessage{
         if(postRepository.findByTitle(post.getTitle()) != null){
@@ -56,7 +55,6 @@ public class PostService {
             postDetail.setPost(post);
             postDetail.setCreatedDate(currentTime);
             postDetail.setUrl(FILE_URL);
-
             fileService.save(file, postDetail);
             postDetails.add(postDetail);
         });
@@ -65,9 +63,14 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    public Post editPost(User user, Integer postId, Post newPost, MultipartFile[] newFiles) throws ErrorMessage{
+    public Post editPost(User user, Integer postId, Post newPost, MultipartFile[] files) throws ErrorMessage{
         Post post = this.findById(postId);
         LocalDateTime currentTime = LocalDateTime.now();
+
+        if(!post.getUser().equals(user)){
+            //cannot edit post
+            return post;
+        }
 
         post.setEditFlag(true);
         post.setDescription(newPost.getDescription());
@@ -81,13 +84,13 @@ public class PostService {
         //remove old Files
         List<PostDetails> oldDetails = postDetailRepository.findByPost(post);
         for(PostDetails i : oldDetails){ 
-            fileService.deleteFile(i.getUrl()+i.getFileName());
+            fileService.deleteFile(FILE_URL+i.getFileName());
         }
         postDetailRepository.deleteAll(oldDetails);
 
         //add new Files
         List<PostDetails> newPostDetails = new ArrayList<>();
-        Arrays.asList(newFiles).stream().forEach(file-> {
+        Arrays.asList(files).stream().forEach(file-> {
             PostDetails postDetail = new PostDetails();
             postDetail.setOriginalFileName(file.getOriginalFilename());
             postDetail.setFileType(file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".")+1));
@@ -101,18 +104,6 @@ public class PostService {
 
         post.setPostDetails(newPostDetails);
         return postRepository.save(post);
-    }
-
-    public String deletePost(User user, Integer postId) throws ErrorMessage{
-        Post post = this.findById(postId);
-
-        if(post.getUser().equals(user)){
-            postRepository.delete(post);
-            return "Delete Successful";
-        }
-        else{
-            return "Post Belongs To Another User";
-        }
     }
 
     public List<PostDto> getAllPostsDto(){
@@ -167,6 +158,23 @@ public class PostService {
         return resources;
     }
 
+    public String deletePost(User user, Integer postId) throws ErrorMessage{
+        Post post = this.findById(postId);
+
+        if(post.getUser().equals(user)){
+            List<PostDetails> postDetails = postDetailRepository.findByPost(post);
+            for(PostDetails i : postDetails){
+                fileService.deleteFile(FILE_URL+i.getFileName());
+            }
+            postDetailRepository.deleteAll(postDetails);
+            postRepository.delete(post);
+            return "Delete Successful";
+        }
+        else{
+            return "Post Belongs To Another User";
+        }
+    }
+
     /* ADMIN SIDE */
 
     public String deletePostByAdmin(Integer id){
@@ -175,8 +183,13 @@ public class PostService {
         Post post = postRepository.findById(id).get();
         
         if(post != null){
-            postRepository.delete(post);
-            return "SUCCESS";
+            try{
+                deletePost(post.getUser(), id);
+            }
+            catch(Exception e){
+                return "FAILED TO DELETE POST";
+            }
+            return "SUCCESS DELETE";
         }
         return "FAILED TO DELETE POST";
     }

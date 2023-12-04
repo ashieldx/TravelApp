@@ -1,11 +1,13 @@
 package com.TravelApp.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Objects;
 
 import org.springframework.core.io.Resource;
@@ -17,6 +19,7 @@ import com.TravelApp.entity.ClaimDetails;
 import com.TravelApp.entity.PostDetails;
 import com.TravelApp.entity.ReviewDetails;
 import com.TravelApp.util.ErrorMessage;
+
 
 @Service
 public class FileService{
@@ -98,10 +101,16 @@ public class FileService{
     public void deleteFile(String url){
         Path path = FileSystems.getDefault().getPath(url);
         try{
-            Files.deleteIfExists(path);
+            Files.delete(path);
         }catch(IOException e){
             throw new RuntimeException("Error deleting File: " + e.getMessage());
         }
+    }
+
+    public void flushAllFiles(){
+        Arrays.stream(new File(postRoot.toString()).listFiles()).forEach(File::delete);
+        Arrays.stream(new File(reviewRoot.toString()).listFiles()).forEach(File::delete);
+        Arrays.stream(new File(claimRoot.toString()).listFiles()).forEach(File::delete);
     }
 
 
