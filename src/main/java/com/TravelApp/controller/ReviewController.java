@@ -8,14 +8,17 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.TravelApp.entity.Review;
 import com.TravelApp.entity.User;
+import com.TravelApp.service.FileService;
 import com.TravelApp.service.ReviewService;
 import com.TravelApp.util.ErrorMessage;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping("/review")
@@ -23,9 +26,25 @@ public class ReviewController {
     @Autowired
     private ReviewService reviewService;
 
+    @Autowired
+    private FileService fileService;
+
+    private static final long MAX_FILE_SIZE = 10485760;
+
     @PostMapping("/post/{id}")
-    public Review postReview(@AuthenticationPrincipal User user, @PathVariable("id") Integer postId, @RequestBody Review review) throws Exception{
-        return reviewService.postReview(user, postId, review);
+    public Review postReview(@AuthenticationPrincipal User user, @PathVariable("id") Integer postId, @RequestParam("files") MultipartFile[] files, 
+        @RequestParam("data") String reviewString) throws Exception{
+        for(MultipartFile i : files){
+            if(!fileService.validateFileType(i)){
+                throw new ErrorMessage("Invalid file Type!");
+            }
+            if(i.getSize() > MAX_FILE_SIZE){
+                throw new ErrorMessage("Files(s) too large!");
+            }
+        }
+        
+        Review review = new ObjectMapper().readValue(reviewString, Review.class);
+        return reviewService.postReview(user, postId, review, files);
     }
 
     @GetMapping("/get/{id}")

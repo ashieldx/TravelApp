@@ -24,6 +24,7 @@ import com.TravelApp.dto.ReportDto;
 import com.TravelApp.entity.Post;
 import com.TravelApp.entity.Report;
 import com.TravelApp.entity.User;
+import com.TravelApp.service.FileService;
 import com.TravelApp.service.PostService;
 import com.TravelApp.service.ReportService;
 import com.TravelApp.util.ErrorMessage;
@@ -41,12 +42,16 @@ public class PostController {
     @Autowired
     private ReportService reportService;
 
+    @Autowired
+    private FileService fileService;
 
     // Post Entity
     @PostMapping("/create")
     public Post createPost(@AuthenticationPrincipal User user, @RequestParam("files") MultipartFile[] files,
         @RequestParam("data") String postString) throws ErrorMessage, JsonMappingException, JsonProcessingException{
-        
+        //validasi file
+        fileService.validateFiles(files);
+
         Post post = new ObjectMapper().readValue(postString, Post.class);
         return postService.savePost(user, post, files);
     }
@@ -62,8 +67,13 @@ public class PostController {
     // }
 
     @PutMapping("/edit/{id}")
-    public Post editPost(@PathVariable("id") Integer id, @RequestBody Post post) throws ErrorMessage{
-        return postService.editPost(id, post);
+    public Post editPost(@AuthenticationPrincipal User user, @RequestParam("files") MultipartFile[] files,
+         @PathVariable("id") Integer id, @RequestParam("data") String postString) throws ErrorMessage, JsonMappingException, JsonProcessingException{
+        //validasi file
+        fileService.validateFiles(files);
+
+        Post post = new ObjectMapper().readValue(postString, Post.class);
+        return postService.editPost(user, id, post, files);
     }
 
     @DeleteMapping("/delete/{id}")

@@ -16,6 +16,7 @@ import com.TravelApp.dto.PostDto;
 import com.TravelApp.entity.Post;
 import com.TravelApp.entity.PostDetails;
 import com.TravelApp.entity.User;
+import com.TravelApp.repository.PostDetailRepository;
 import com.TravelApp.repository.PostRepository;
 import com.TravelApp.repository.ReviewRepository;
 import com.TravelApp.util.ErrorMessage;
@@ -26,10 +27,15 @@ public class PostService {
     private PostRepository postRepository;
 
     @Autowired
+    private PostDetailRepository postDetailRepository;
+
+    @Autowired
     private FileService fileService;
 
     @Autowired
     private ReviewRepository reviewRepository;
+
+    public final static String FILE_URL = "uploads/post-details/";
 
     public Post savePost(User user, Post post, MultipartFile[] files) throws ErrorMessage{
         if(postRepository.findByTitle(post.getTitle()) != null){
@@ -46,14 +52,10 @@ public class PostService {
             PostDetails postDetail = new PostDetails();
             postDetail.setOriginalFileName(file.getOriginalFilename());
             postDetail.setFileType(file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".")+1));
-
-            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm");
-            postDetail.setFileName(currentTime.format(dateTimeFormatter) + 
-                                "_" + (postDetails.size()+1) + 
-                                "." + postDetail.getFileType());
+            postDetail.setFileName(post.getTitle() + "_" + postDetails.size() + "." + postDetail.getFileType());
             postDetail.setPost(post);
             postDetail.setCreatedDate(currentTime);
-            postDetail.setUrl("/uploads/post-details/" + postDetail.getFileName());
+            postDetail.setUrl(FILE_URL);
 
             fileService.save(file, postDetail);
             postDetails.add(postDetail);
@@ -63,8 +65,9 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    public Post editPost(Integer postId, Post newPost) throws ErrorMessage{
+    public Post editPost(User user, Integer postId, Post newPost, MultipartFile[] newFiles) throws ErrorMessage{
         Post post = this.findById(postId);
+        LocalDateTime currentTime = LocalDateTime.now();
 
         post.setEditFlag(true);
         post.setDescription(newPost.getDescription());
@@ -73,8 +76,30 @@ public class PostService {
         post.setOpeningHour(newPost.getOpeningHour());
         post.setClosingHour(newPost.getClosingHour());
         post.setPhoneNumber(newPost.getPhoneNumber());
-        post.setModifiedDate(LocalDateTime.now());
+        post.setModifiedDate(currentTime);
 
+        //remove old Files
+        List<PostDetails> oldDetails = postDetailRepository.findByPost(post);
+        for(PostDetails i : oldDetails){ 
+            fileService.deleteFile(i.getUrl()+i.getFileName());
+        }
+        postDetailRepository.deleteAll(oldDetails);
+
+        //add new Files
+        List<PostDetails> newPostDetails = new ArrayList<>();
+        Arrays.asList(newFiles).stream().forEach(file-> {
+            PostDetails postDetail = new PostDetails();
+            postDetail.setOriginalFileName(file.getOriginalFilename());
+            postDetail.setFileType(file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".")+1));
+            postDetail.setFileName(post.getTitle() + "_" + newPostDetails.size() + "." + postDetail.getFileType());
+            postDetail.setPost(post);
+            postDetail.setCreatedDate(currentTime);
+            postDetail.setUrl(FILE_URL);
+            fileService.save(file, postDetail);
+            newPostDetails.add(postDetail);
+        });
+
+        post.setPostDetails(newPostDetails);
         return postRepository.save(post);
     }
 
@@ -83,11 +108,10 @@ public class PostService {
 
         if(post.getUser().equals(user)){
             postRepository.delete(post);
-
             return "Delete Successful";
         }
         else{
-            throw new ErrorMessage("Post Belongs To Another User");
+            return "Post Belongs To Another User";
         }
     }
 
@@ -106,7 +130,10 @@ public class PostService {
             postDtoList.add(new PostDto(i.getId(), 
                 i.getTitle(), 
                 i.getDescription(), 
-                i.getPostDetails().get(0).getFileName(),
+                (i.getPostDetails().size() == 0 ? 
+                    "No Image" : 
+                    i.getPostDetails().get(0).getUrl()+
+                    i.getPostDetails().get(0).getFileName()),
                 i.getCreatedDate(), 
                 i.getEditFlag(), 
                 rounded, 
@@ -134,7 +161,7 @@ public class PostService {
         Optional<Post> post = postRepository.findById(postId);
         if(post.isPresent()){
             for(PostDetails postDetails : post.get().getPostDetails()){
-                resources.add(fileService.getFileByName(postDetails.getFileName()));
+                resources.add(fileService.getFileByName(postDetails.getFileName(), postDetails.getUrl()));
             }
         }
         return resources;

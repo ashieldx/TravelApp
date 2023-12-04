@@ -1,13 +1,18 @@
 package com.TravelApp.service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.TravelApp.entity.Like;
 import com.TravelApp.entity.Review;
+import com.TravelApp.entity.ReviewDetails;
 import com.TravelApp.entity.User;
 import com.TravelApp.repository.LikeRepository;
 import com.TravelApp.repository.ReviewRepository;
@@ -24,15 +29,18 @@ public class ReviewService {
     @Autowired
     private LikeRepository likeRepository;
 
+    @Autowired
+    private FileService fileService;
+
     private static final String LIKE = "LIKE";
     private static final String DISLIKE = "DISLIKE";
     
-    public Review postReview(User user, Integer postId, Review review) throws Exception{
+    public Review postReview(User user, Integer postId, Review review, MultipartFile[] files) throws Exception{
 
         if(reviewRepository.findByPostIdAndUsername(postId, user.getUsername()) != null){
             throw new Exception("You Already Reviewed This Post");
         }
-
+        
         LocalDateTime currentTime = LocalDateTime.now();
         review.setCreatedDate(currentTime);
         review.setModifiedDate(currentTime);
@@ -41,6 +49,24 @@ public class ReviewService {
         review.setPostId(postId);
         review.setUsername(user.getUsername());
 
+        List<ReviewDetails> reviewDetails = new ArrayList<>();
+        Arrays.asList(files).stream().forEach(file->{
+            ReviewDetails reviewDetail = new ReviewDetails();
+            reviewDetail.setOriginalFileName(file.getOriginalFilename());
+            reviewDetail.setFileType(file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".")+1));
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm");
+            reviewDetail.setFileName(currentTime.format(dateTimeFormatter) + 
+                                "_" + (reviewDetails.size()+1) + 
+                                "." + reviewDetail.getFileType());
+            reviewDetail.setReview(review);
+            reviewDetail.setCreatedDate(currentTime);
+            reviewDetail.setUrl("/uploads/review-details/");
+
+            fileService.save(file, reviewDetail);
+            reviewDetails.add(reviewDetail);
+        });
+
+        review.setReviewDetails(reviewDetails);
         noticationService.createReviewNotification(user, postId);
         return reviewRepository.save(review);
     }
@@ -122,4 +148,5 @@ public class ReviewService {
             throw new ErrorMessage("Review Belongs To Another User");
         }
     }
+
 }
