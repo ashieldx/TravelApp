@@ -1,5 +1,7 @@
 package com.TravelApp.entity;
 
+import java.time.LocalDateTime;
+
 import org.hibernate.annotations.ColumnDefault;
 
 import jakarta.persistence.Column;
@@ -31,6 +33,9 @@ public class Report {
 
     @Column(name = "message")
     private String message;
+
+    @Column(name = "created_date")
+    private LocalDateTime createdDate;
 
     @Column(name = "is_read")
     @ColumnDefault("false")

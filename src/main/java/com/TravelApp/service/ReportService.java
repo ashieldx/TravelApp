@@ -1,5 +1,6 @@
 package com.TravelApp.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +23,10 @@ public class ReportService {
 
     public Report createReport(User user, Integer postId, String message){
         Report report = new Report();
-
         report.setSenderId(user.getId());
         report.setPostId(postId);
         report.setMessage(message);
+        report.setCreatedDate(LocalDateTime.now());
 
         return reportRepository.save(report);
     }

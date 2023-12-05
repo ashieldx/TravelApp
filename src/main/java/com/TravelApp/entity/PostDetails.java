@@ -18,7 +18,6 @@ import lombok.Data;
 @Entity
 @Table(name = "mst_post_details")
 public class PostDetails {  
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

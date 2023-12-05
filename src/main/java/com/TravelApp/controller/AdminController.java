@@ -21,6 +21,7 @@ import com.TravelApp.service.PostService;
 import com.TravelApp.service.ReportService;
 import com.TravelApp.util.ErrorMessage;
 
+
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
@@ -60,11 +61,19 @@ public class AdminController {
 
     //View, Approve, Reject Claims
     @GetMapping("/claim/getAll")
-    public List<Claim> getAllClaims()[
+    public List<Claim> getAllClaims(){
         return claimService.getAllClaims();
-    ]
+    }
 
-    
+    @GetMapping("/claim/approve/{id}")
+    public Claim approveClaim(@PathVariable("id") Integer id){
+        return claimService.approveClaim(id);
+    }
+
+    @GetMapping("claim/reject/{id}")
+    public Claim rejectClaim(@PathVariable("id") Integer id){
+        return claimService.rejectClaim(id);
+    }
 
     //Send chat to user
 

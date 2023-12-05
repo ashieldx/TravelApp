@@ -43,10 +43,7 @@ public class Claim {
     private String comments;
 
     @Column(name = "created_date")
-    private LocalDateTime createdDate;
-
-    @Column(name = "modified")
-    private LocalDateTime modifiedDate;
+    private LocalDateTime createdDate;  
 
     @OneToMany(mappedBy = "claim", cascade = CascadeType.ALL)
     private List<ClaimDetails> claimDetails = new ArrayList<ClaimDetails>();
