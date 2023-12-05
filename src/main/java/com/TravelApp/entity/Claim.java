@@ -1,5 +1,6 @@
 package com.TravelApp.entity;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +38,15 @@ public class Claim {
 
     @Column(name = "status")
     private String status;
+
+    @Column(name = "comments")
+    private String comments;
+
+    @Column(name = "created_date")
+    private LocalDateTime createdDate;
+
+    @Column(name = "modified")
+    private LocalDateTime modifiedDate;
 
     @OneToMany(mappedBy = "claim", cascade = CascadeType.ALL)
     private List<ClaimDetails> claimDetails = new ArrayList<ClaimDetails>();

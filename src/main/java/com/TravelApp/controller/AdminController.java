@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.TravelApp.entity.Category;
+import com.TravelApp.entity.Claim;
 import com.TravelApp.entity.Report;
 import com.TravelApp.service.CategoryService;
+import com.TravelApp.service.ClaimService;
 import com.TravelApp.service.FileService;
 import com.TravelApp.service.PostService;
 import com.TravelApp.service.ReportService;
@@ -31,6 +33,9 @@ public class AdminController {
 
     @Autowired
     private ReportService reportService;
+
+    @Autowired
+    private ClaimService claimService;
 
     @Autowired
     private FileService fileService;
@@ -53,7 +58,13 @@ public class AdminController {
         return reportService.getAll();
     }
 
-    //Approve Claims
+    //View, Approve, Reject Claims
+    @GetMapping("/claim/getAll")
+    public List<Claim> getAllClaims()[
+        return claimService.getAllClaims();
+    ]
+
+    
 
     //Send chat to user
 

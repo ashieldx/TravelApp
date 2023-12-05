@@ -21,9 +21,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.TravelApp.dto.PostDto;
 import com.TravelApp.dto.ReportDto;
+import com.TravelApp.entity.Claim;
 import com.TravelApp.entity.Post;
 import com.TravelApp.entity.Report;
 import com.TravelApp.entity.User;
+import com.TravelApp.service.ClaimService;
 import com.TravelApp.service.FileService;
 import com.TravelApp.service.PostService;
 import com.TravelApp.service.ReportService;
@@ -41,6 +43,9 @@ public class PostController {
 
     @Autowired
     private ReportService reportService;
+
+    @Autowired
+    private ClaimService claimService;
 
     @Autowired
     private FileService fileService;
@@ -61,10 +66,13 @@ public class PostController {
         return reportService.createReport(user, id, report.getMessage());
     }
 
-    // @PostMapping("/claim/{id}")
-    // public Claim claimPost(@AuthenticationPrincipal User user, @PathVariable("id") Integer id, @RequestBody ClaimDto claim){
+    @PostMapping("/claim/{id}")
+    public Claim claimPost(@AuthenticationPrincipal User user, @PathVariable("id") Integer id, @RequestParam("files") MultipartFile[] files,
+        @RequestParam("data") String claimString) throws JsonMappingException, JsonProcessingException{
         
-    // }
+        Claim claim = new ObjectMapper().readValue(claimString, Claim.class);
+        return claimService.claimPost(user, claim, id, files);
+    }
 
     @PutMapping("/edit/{id}")
     public Post editPost(@AuthenticationPrincipal User user, @RequestParam("files") MultipartFile[] files,

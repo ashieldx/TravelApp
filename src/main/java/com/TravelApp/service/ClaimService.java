@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,15 +32,17 @@ public class ClaimService {
 
     private static final String FILE_URL = "uploads/claim-details/";
     private static final String NEW_CLAIM_STATUS = "NEW";
+    private static final String APPROVED_CLAIM_STATUS = "APRVD";
+    private static final String REJECTED_CLAIM_STATUS = "RJCTD";
 
-    public Claim claimPost(User user, Integer postId, MultipartFile[] files){
+    public Claim claimPost(User user, Claim claim, Integer postId, MultipartFile[] files){
         Post post = postRepository.findById(postId).get();
-        LocalDateTime currentTime = LocalDateTime.now();
+        LocalDateTime currTime = LocalDateTime.now();
 
-        Claim claim = new Claim();
         claim.setUser(user);
         claim.setPost(post);
         claim.setStatus(NEW_CLAIM_STATUS);
+        claim.setCreatedDate(currTime);
 
         List<ClaimDetails> claimDetails = new ArrayList<>();
         Arrays.asList(files).stream().forEach(file-> {
@@ -48,14 +51,40 @@ public class ClaimService {
             claimDetail.setFileType(file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".")+1));
             claimDetail.setFileName(UUID.randomUUID().toString() + "." + claimDetail.getFileType());
             claimDetail.setClaim(claim);
-            claimDetail.setCreatedDate(currentTime);
+            claimDetail.setCreatedDate(currTime);
             claimDetail.setUrl(FILE_URL);
             fileService.save(file, claimDetail);
             claimDetails.add(claimDetail);
         });
 
         claim.setClaimDetails(claimDetails);
+
+        //auto rejection
+        if(claim.getPost().getUser().equals(user)){
+            claim.setStatus(REJECTED_CLAIM_STATUS);
+            claim.setComments("You cannot claim your Own Post!");
+        }
+
         return claimRepository.save(claim);
     }
+
+    public List<Claim> getAllClaims(){
+        return claimRepository.findAll();
+    }
+
+    public Claim approveClaim(Integer claimId){
+        Claim claim = claimRepository.findById(claimId).get();
+        claim.setStatus(APPROVED_CLAIM_STATUS);
+        claim.setModifiedDate(LocalDateTime.now());
+        return claimRepository.save(claim);
+    }
+
+    public Claim rejectClaim(Integer claimId){
+        Claim claim = claimRepository.findById(claimId).get();
+        claim.setStatus(REJECTED_CLAIM_STATUS);
+        claim.setModifiedDate(LocalDateTime.now());
+        return claimRepository.save(claim);
+    }
+
     
 }

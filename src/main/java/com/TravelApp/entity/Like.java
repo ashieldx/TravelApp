@@ -1,5 +1,7 @@
 package com.TravelApp.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,4 +31,6 @@ public class Like {
     @Column(name = "action")
     private String action;
     
+    @Column(name = "created_date")
+    private LocalDateTime createdDate;
 }

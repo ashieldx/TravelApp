@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -113,17 +114,20 @@ public class ReviewService {
     public Review likeReview(Integer userId, Integer reviewId){
         Like like = likeRepository.findByUserIdAndReviewId(userId, reviewId);
         Review review = reviewRepository.findById(reviewId).get();
+        LocalDateTime currTime = LocalDateTime.now();
 
         if(like == null){
             Like newLike = new Like();
             newLike.setReviewId(reviewId);
             newLike.setUserId(userId);
             newLike.setAction(LIKE);
+            newLike.setCreatedDate(currTime);
             likeRepository.save(newLike);
             noticationService.createLikeNotification(userId, reviewId);
         }
         else if(like.getAction().equals(DISLIKE)){
             like.setAction(LIKE);
+            like.setCreatedDate(currTime);
             likeRepository.save(like);
             noticationService.createLikeNotification(userId, reviewId);
         }
@@ -144,17 +148,19 @@ public class ReviewService {
     public Review dislikeReview(Integer userId, Integer reviewId){
         Like like = likeRepository.findByUserIdAndReviewId(userId, reviewId);
         Review review  = reviewRepository.findById(reviewId).get();
+        LocalDateTime currTime = LocalDateTime.now();
 
         if(like == null){
             Like newLike = new Like();
             newLike.setReviewId(reviewId);
             newLike.setUserId(userId);
             newLike.setAction(DISLIKE);
+            newLike.setCreatedDate(currTime);
             likeRepository.save(newLike);
         }
         else if(like.getAction().equals(LIKE)){
             like.setAction(DISLIKE);
-            likeRepository.save(like);
+            like.setCreatedDate(currTime);
             likeRepository.save(like);
         }
         else{
