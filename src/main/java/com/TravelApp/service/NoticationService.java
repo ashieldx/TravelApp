@@ -41,7 +41,7 @@ public class NoticationService {
     @Autowired
     private ReviewRepository reviewRepository;
 
-    public List<Notification> getAllUserNotificaiton(User user){
+    public List<Notification> getAllUserNotificaton(User user){
         return notificationRepository.findByUserId(user.getId());
     }
 

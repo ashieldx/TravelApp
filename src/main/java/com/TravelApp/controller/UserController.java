@@ -30,7 +30,7 @@ public class UserController {
 
     @GetMapping("/getUserNotifications")
     public List<Notification> getUserNotifications(@AuthenticationPrincipal User user){
-        return noticationService.getAllUserNotificaiton(user);
+        return noticationService.getAllUserNotificaton(user);
     }
 
     @GetMapping("/getAll")
