@@ -14,12 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.TravelApp.entity.Category;
 import com.TravelApp.entity.Claim;
 import com.TravelApp.entity.Report;
+import com.TravelApp.response.CommonResponse;
+import com.TravelApp.response.CommonResponseGenerator;
 import com.TravelApp.service.CategoryService;
 import com.TravelApp.service.ClaimService;
 import com.TravelApp.service.FileService;
 import com.TravelApp.service.PostService;
 import com.TravelApp.service.ReportService;
-import com.TravelApp.util.ErrorMessage;
 
 
 @RestController
@@ -41,38 +42,76 @@ public class AdminController {
     @Autowired
     private FileService fileService;
 
+    @Autowired
+    private CommonResponseGenerator commonResponseGenerator;
+
     //POST
     @DeleteMapping("/delete/{id}")
-    public String deletePost(@PathVariable("id") Integer id) throws ErrorMessage{
-        return postService.deletePostByAdmin(id);
+    public CommonResponse<String> deletePost(@PathVariable("id") Integer id){
+        try{
+            postService.deletePostByAdmin(id);
+        }catch(Exception e){
+            return commonResponseGenerator.errorResponse(null, e.getMessage());
+        }
+        return commonResponseGenerator.successResponse("Post Deleted", "Delete Post by Admin Success");
     }
 
     //NOT TESTED
     @PostMapping("/createCategory")
-    public Category createCategory(@RequestBody Category category){
-        return categoryService.createCategory(category);
+    public CommonResponse<Category> createCategory(@RequestBody Category category){
+        Category categoryResponse = null;
+        try{
+            categoryResponse = categoryService.createCategory(category);;
+        }catch (Exception e){
+            return commonResponseGenerator.errorResponse(null , "Failed to Create Category");
+        }
+        return commonResponseGenerator.errorResponse(categoryResponse, "Create Category Success");
     }
 
     //Get All User Reports
     @GetMapping("/getUserReports")
-    public List<Report> getUserReports(){
-        return reportService.getAll();
+    public CommonResponse<List<Report>> getUserReports(){
+        List<Report> reportResponse = null;
+        try{
+            reportResponse = reportService.getAll();
+        }catch (Exception e){
+            return commonResponseGenerator.errorResponse(null, "Failed to Retrieve Reports");
+        }
+       return commonResponseGenerator.errorResponse(reportResponse, "Get Report List Success");
     }
 
     //View, Approve, Reject Claims
     @GetMapping("/claim/getAll")
-    public List<Claim> getAllClaims(){
-        return claimService.getAllClaims();
+    public CommonResponse<List<Claim>> getAllClaims(){
+        List<Claim> claimResponse = null;
+        try{
+            claimResponse = claimService.getAllClaims();
+        } catch(Exception e){
+            return commonResponseGenerator.errorResponse(null , "Failed to Retrieve Claims");
+        }
+        return commonResponseGenerator.successResponse(claimResponse, "Get All Claims Success");
     }
 
     @GetMapping("/claim/approve/{id}")
-    public Claim approveClaim(@PathVariable("id") Integer id){
-        return claimService.approveClaim(id);
+    public CommonResponse<Claim> approveClaim(@PathVariable("id") Integer id){
+        Claim claimResponse = null;
+        try{
+            claimResponse = claimService.approveClaim(id);
+        }catch(Exception e){
+            return commonResponseGenerator.errorResponse(null, "Error Approve Claim");
+        }
+        return commonResponseGenerator.errorResponse(claimResponse, "Approve Claim Success");
     }
 
     @GetMapping("claim/reject/{id}")
-    public Claim rejectClaim(@PathVariable("id") Integer id){
-        return claimService.rejectClaim(id);
+    public CommonResponse<Claim> rejectClaim(@PathVariable("id") Integer id){
+        Claim claimResponse = null;
+        try{
+            claimResponse = claimService.rejectClaim(id);
+        }catch(Exception e){
+            return commonResponseGenerator.errorResponse(null, "Error Reject Claim");
+        }
+        return commonResponseGenerator.errorResponse(claimResponse, "Reject Claim Success");
     }
 
     //Send chat to user
@@ -81,8 +120,13 @@ public class AdminController {
 
     //WARNING
     @GetMapping("flush-all")
-    public void flushFiles(){
-        fileService.flushAllFiles();
+    public CommonResponse<String> flushFiles(){
+        try{
+            fileService.flushAllFiles();
+        }catch(Exception e){
+            return commonResponseGenerator.errorResponse(null, "Error Flush Files");
+        }
+        return commonResponseGenerator.successResponse(null, "Flush Files Success");
     }
 
 

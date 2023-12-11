@@ -158,7 +158,7 @@ public class PostService {
         return resources;
     }
 
-    public String deletePost(User user, Integer postId) throws ErrorMessage{
+    public Boolean deletePost(User user, Integer postId) throws ErrorMessage{
         Post post = this.findById(postId);
 
         if(post.getUser().equals(user)){
@@ -167,28 +167,21 @@ public class PostService {
                 fileService.deleteFile(FILE_URL+i.getFileName());
             }
             postDetailRepository.deleteAll(postDetails);
-            postRepository.delete(post);
-            return "Delete Successful";
+            postRepository.delete(post);    
+            return true; 
         }
-        else{
-            return "Post Belongs To Another User";
-        }
+        throw new ErrorMessage("Post Belongs To Another User");
     }
 
     /* ADMIN SIDE */
 
-    public String deletePostByAdmin(Integer id){
+    public String deletePostByAdmin(Integer id) throws ErrorMessage{
 
         //send Notification to user
         Post post = postRepository.findById(id).get();
         
         if(post != null){
-            try{
-                deletePost(post.getUser(), id);
-            }
-            catch(Exception e){
-                return "FAILED TO DELETE POST";
-            }
+            deletePost(post.getUser(), id);
             return "SUCCESS DELETE";
         }
         return "FAILED TO DELETE POST";

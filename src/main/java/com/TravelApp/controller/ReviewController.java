@@ -16,9 +16,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.TravelApp.entity.Review;
 import com.TravelApp.entity.User;
+import com.TravelApp.response.CommonResponse;
+import com.TravelApp.response.CommonResponseGenerator;
 import com.TravelApp.service.FileService;
 import com.TravelApp.service.ReviewService;
-import com.TravelApp.util.ErrorMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,52 +33,78 @@ public class ReviewController {
     @Autowired
     private FileService fileService;
 
-    private static final long MAX_FILE_SIZE = 10485760;
+    @Autowired
+    private CommonResponseGenerator commonResponseGenerator;
 
     @PostMapping("/post/{id}")
-    public Review postReview(@AuthenticationPrincipal User user, @PathVariable("id") Integer postId, @RequestParam("files") MultipartFile[] files, 
-        @RequestParam("data") String reviewString) throws Exception{
-        for(MultipartFile i : files){
-            if(!fileService.validateFileType(i)){
-                throw new ErrorMessage("Invalid file Type!");
-            }
-            if(i.getSize() > MAX_FILE_SIZE){
-                throw new ErrorMessage("Files(s) too large!");
-            }
-        }
-        
+    public CommonResponse<Review> postReview(@AuthenticationPrincipal User user, @PathVariable("id") Integer postId, @RequestParam("files") MultipartFile[] files, 
+        @RequestParam("data") String reviewString) throws JsonMappingException, JsonProcessingException{
         Review review = new ObjectMapper().readValue(reviewString, Review.class);
-        return reviewService.postReview(user, postId, review, files);
+        Review reviewResponse = null;
+        try{
+            fileService.validateFiles(files);
+            reviewResponse =reviewService.postReview(user, postId, review, files);
+        }catch (Exception e){
+            return commonResponseGenerator.errorResponse(null, e.getMessage());
+        }
+        return commonResponseGenerator.successResponse(reviewResponse, "Post Review Success");
     }
 
     @PutMapping("/edit/{id}")
-    public Review editPost(@AuthenticationPrincipal User user, @RequestParam("files") MultipartFile[] files,
-         @PathVariable("id") Integer id, @RequestParam("data") String reviewString) throws ErrorMessage, JsonMappingException, JsonProcessingException{
-        //validasi file
-        fileService.validateFiles(files);
-
+    public CommonResponse<Review> editPost(@AuthenticationPrincipal User user, @RequestParam("files") MultipartFile[] files,
+         @PathVariable("id") Integer id, @RequestParam("data") String reviewString) throws JsonMappingException, JsonProcessingException{
         Review review = new ObjectMapper().readValue(reviewString, Review.class);
-        return reviewService.editReview(user, id, review, files);
+        Review reviewResponse = null;
+        try{
+            fileService.validateFiles(files);
+            reviewResponse =reviewService.postReview(user, id, review, files);
+        }catch (Exception e){
+            return commonResponseGenerator.errorResponse(null, e.getMessage());
+        }
+        return commonResponseGenerator.successResponse(reviewResponse, "Edit Review Success");
     }
 
     @GetMapping("/get/{id}")
-    public List<Review> getPostReviews(@PathVariable("id") Integer id){
-        return reviewService.getPostReviews(id);
+    public CommonResponse<List<Review>> getPostReviews(@PathVariable("id") Integer id){
+        List<Review> reviewResponse = null;
+        try{
+            reviewResponse = reviewService.getPostReviews(id);
+        }catch(Exception e){
+            return commonResponseGenerator.errorResponse(null, "Failed to Retrive Reviews");
+        }
+        return commonResponseGenerator.successResponse(reviewResponse, "Get Post Review List Success");
     }
 
     @PostMapping("like/{id}")
-    public Review likeReview(@AuthenticationPrincipal User user, @PathVariable("id") Integer reviewId){
-        return reviewService.likeReview(user.getId(), reviewId);
+    public CommonResponse<Review> likeReview(@AuthenticationPrincipal User user, @PathVariable("id") Integer reviewId){
+        Review reviewResponse = null;
+        try{
+            reviewService.likeReview(user.getId(), reviewId);
+        }catch(Exception e){
+            return commonResponseGenerator.errorResponse(null, e.getMessage());
+        }
+        return commonResponseGenerator.successResponse(reviewResponse, "Like Review Success");
     }
 
     @PostMapping("dislike/{id}")
-    public Review dislikeReview(@AuthenticationPrincipal User user, @PathVariable("id") Integer reviewId){
-        return reviewService.dislikeReview(user.getId(), reviewId);
+    public CommonResponse<Review> dislikeReview(@AuthenticationPrincipal User user, @PathVariable("id") Integer reviewId){
+        Review reviewResponse = null;
+        try{
+            reviewService.likeReview(user.getId(), reviewId);
+        }catch(Exception e){
+            return commonResponseGenerator.errorResponse(null, e.getMessage());
+        }
+        return commonResponseGenerator.successResponse(reviewResponse, "Dislike Review Success");
     }
 
     @DeleteMapping("/delete/{id}")
-    public String deleteReview(@AuthenticationPrincipal User user, @PathVariable("id") Integer id) throws ErrorMessage{
-        return reviewService.deleteReview(user, id);
+    public CommonResponse<String> deleteReview(@AuthenticationPrincipal User user, @PathVariable("id") Integer id){
+        try{
+            reviewService.deleteReview(user, id);
+        }catch (Exception e){
+            return commonResponseGenerator.errorResponse(null, e.getMessage());
+        }
+        return commonResponseGenerator.successResponse("Review Deleted", "Delete Review Success");
     }
 
     

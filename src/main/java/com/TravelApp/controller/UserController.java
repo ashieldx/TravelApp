@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.TravelApp.entity.Notification;
 import com.TravelApp.entity.User;
+import com.TravelApp.response.CommonResponse;
+import com.TravelApp.response.CommonResponseGenerator;
 import com.TravelApp.service.NoticationService;
 import com.TravelApp.service.UserService;
 
@@ -22,15 +24,24 @@ public class UserController {
 
     @Autowired
     private NoticationService noticationService;
+
+    @Autowired
+    private CommonResponseGenerator commonResponseGenerator;
     
     @GetMapping("/getCurrentUsername")
-    public String getCurrentUsername(@AuthenticationPrincipal User user){
-        return user.getUsername();
+    public CommonResponse<String> getCurrentUsername(@AuthenticationPrincipal User user){
+        return commonResponseGenerator.successResponse(user.getUsername(), "Username Retrieve Success");
     }
 
     @GetMapping("/getUserNotifications")
-    public List<Notification> getUserNotifications(@AuthenticationPrincipal User user){
-        return noticationService.getAllUserNotificaton(user);
+    public CommonResponse<List<Notification>> getUserNotifications(@AuthenticationPrincipal User user){
+        List<Notification> noticationResponse = null;
+        try{
+            noticationResponse = noticationService.getAllUserNotificaton(user);
+        }catch(Exception e){
+            return commonResponseGenerator.errorResponse(null, "Failed to Retreive User Notifications");
+        }
+        return commonResponseGenerator.successResponse(noticationResponse, "Get User Notification List Success");
     }
 
     @GetMapping("/getAll")

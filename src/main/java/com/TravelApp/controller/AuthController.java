@@ -18,6 +18,8 @@ import com.TravelApp.entity.Token;
 import com.TravelApp.entity.User;
 import com.TravelApp.repository.TokenRepository;
 import com.TravelApp.repository.UserRepository;
+import com.TravelApp.response.CommonResponse;
+import com.TravelApp.response.CommonResponseGenerator;
 import com.TravelApp.util.ErrorMessage;
 
 @RestController
@@ -40,12 +42,14 @@ public class AuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private CommonResponseGenerator commonResponseGenerator;
 
     @PostMapping("/register")
-    public AuthResponse register(@RequestBody User userRequest) throws ErrorMessage{
+    public CommonResponse<AuthResponse> register(@RequestBody User userRequest) throws ErrorMessage{
         //Validation for duplicate username
         if(userRepository.findFirstByUsername(userRequest.getUsername()) != null){
-            throw new ErrorMessage("Username Already Exist");
+            return commonResponseGenerator.errorResponse(null, "Username already Exist");
         }
 
         String encrypted = passwordEncoder.encode(userRequest.getPassword());
@@ -58,23 +62,27 @@ public class AuthController {
         saveToken(savedUser, jwtToken);
 
         AuthResponse authResponse = new AuthResponse(userRequest, jwtToken);
-        return authResponse;
+        return commonResponseGenerator.successResponse(authResponse, "Register Success");
 
     }
 
     @PostMapping("/login")
-    public AuthResponse login(@RequestBody UserLoginDto user) throws ErrorMessage{
+    public CommonResponse<AuthResponse> login(@RequestBody UserLoginDto user) throws ErrorMessage{
         if(userRepository.findFirstByUsername(user.getUsername()) == null){
-            throw new ErrorMessage("Username Not Found");
+            return commonResponseGenerator.errorResponse(null, "Username not Found");
         }
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
-
+        try{
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+        }catch(Exception e){
+            return commonResponseGenerator.errorResponse(null, "Invalid Credentials");
+        }
+        
         User authenticatedUser = userRepository.findFirstByUsername(user.getUsername());
         String jwtToken = jwtService.generateToken(authenticatedUser);
         saveToken(authenticatedUser, jwtToken);
 
         AuthResponse authResponse = new AuthResponse(authenticatedUser, jwtToken);
-        return authResponse;
+        return commonResponseGenerator.successResponse(authResponse, "Login Success");
 
     }
 

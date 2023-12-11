@@ -3,10 +3,6 @@ package com.TravelApp.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,11 +21,12 @@ import com.TravelApp.entity.Claim;
 import com.TravelApp.entity.Post;
 import com.TravelApp.entity.Report;
 import com.TravelApp.entity.User;
+import com.TravelApp.response.CommonResponse;
+import com.TravelApp.response.CommonResponseGenerator;
 import com.TravelApp.service.ClaimService;
 import com.TravelApp.service.FileService;
 import com.TravelApp.service.PostService;
 import com.TravelApp.service.ReportService;
-import com.TravelApp.util.ErrorMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,62 +47,93 @@ public class PostController {
     @Autowired
     private FileService fileService;
 
+    @Autowired
+    private CommonResponseGenerator commonResponseGenerator;
+
     // Post Entity
     @PostMapping("/create")
-    public Post createPost(@AuthenticationPrincipal User user, @RequestParam("files") MultipartFile[] files,
-        @RequestParam("data") String postString) throws ErrorMessage, JsonMappingException, JsonProcessingException{
-        //validasi file
-        fileService.validateFiles(files);
-
+    public CommonResponse<Post> createPost(@AuthenticationPrincipal User user, @RequestParam("files") MultipartFile[] files,
+        @RequestParam("data") String postString) throws JsonMappingException, JsonProcessingException{
         Post post = new ObjectMapper().readValue(postString, Post.class);
-        return postService.savePost(user, post, files);
+        Post postResponse = null;
+        try{
+            fileService.validateFiles(files);
+            postResponse = postService.savePost(user, post, files);
+        } catch(Exception e){
+            return commonResponseGenerator.errorResponse(null, e.getMessage());
+        }
+        return commonResponseGenerator.successResponse(postResponse, "Create Post Success");
     }
 
     @PostMapping("report/{id}")
-    public Report createReport(@AuthenticationPrincipal User user, @PathVariable("id") Integer id, @RequestBody ReportDto report){
-        return reportService.createReport(user, id, report.getMessage());
+    public CommonResponse<Report> createReport(@AuthenticationPrincipal User user, @PathVariable("id") Integer id, @RequestBody ReportDto report){
+        Report reportResponse = null;
+        try{
+            reportResponse = reportService.createReport(user, id, report.getMessage());
+        }catch(Exception e){
+            return commonResponseGenerator.errorResponse(null, e.getMessage());
+        }
+        return commonResponseGenerator.successResponse(reportResponse, "Report Success");
     }
 
     @PostMapping("/claim/{id}")
-    public Claim claimPost(@AuthenticationPrincipal User user, @PathVariable("id") Integer id, @RequestParam("files") MultipartFile[] files,
-        @RequestParam("data") String claimString) throws JsonMappingException, JsonProcessingException{
-        
+    public CommonResponse<Claim> claimPost(@AuthenticationPrincipal User user, @PathVariable("id") Integer id, @RequestParam("files") MultipartFile[] files,
+        @RequestParam("data") String claimString) throws JsonMappingException, JsonProcessingException{  
         Claim claim = new ObjectMapper().readValue(claimString, Claim.class);
-        return claimService.claimPost(user, claim, id, files);
+        Claim claimResponse = null;
+        try{
+            claimResponse = claimService.claimPost(user, claim, id, files);
+        }catch (Exception e){
+            return commonResponseGenerator.errorResponse(null, e.getMessage());
+        }
+        return commonResponseGenerator.successResponse(claimResponse, "Request Claim Success");
     }
 
     @PutMapping("/edit/{id}")
-    public Post editPost(@AuthenticationPrincipal User user, @RequestParam("files") MultipartFile[] files,
-         @PathVariable("id") Integer id, @RequestParam("data") String postString) throws ErrorMessage, JsonMappingException, JsonProcessingException{
-        //validasi file
-        fileService.validateFiles(files);
-
+    public CommonResponse<Post> editPost(@AuthenticationPrincipal User user, @RequestParam("files") MultipartFile[] files,
+         @PathVariable("id") Integer id, @RequestParam("data") String postString) throws JsonMappingException, JsonProcessingException{
         Post post = new ObjectMapper().readValue(postString, Post.class);
-        return postService.editPost(user, id, post, files);
+        Post postResponse = null;
+        try{
+            fileService.validateFiles(files);
+            postResponse = postService.editPost(user, id, post, files);
+        }catch (Exception e){
+            return commonResponseGenerator.errorResponse(null, e.getMessage());
+        }
+        return commonResponseGenerator.successResponse(postResponse, "Edit Post Success");
     }
 
     @DeleteMapping("/delete/{id}")
-    public String deletePost(@AuthenticationPrincipal User user, @PathVariable("id") Integer id) throws ErrorMessage{
-        return postService.deletePost(user, id);
+    public CommonResponse<String> deletePost(@AuthenticationPrincipal User user, @PathVariable("id") Integer id){
+        try{
+            postService.deletePost(user, id);
+        } catch(Exception e){
+            return commonResponseGenerator.errorResponse(null, e.getMessage());
+        }
+        return commonResponseGenerator.successResponse("Post Deleted", "Delete Post Success");
     }
 
     @GetMapping("/get/{id}")
-    public Post getPostById(@PathVariable("id") Integer id) throws ErrorMessage{
-        return postService.findById(id);
-    }
-
-    @GetMapping("/getFiles/{id}/{fileNumber}")
-    public ResponseEntity<Resource> getFiles(@PathVariable("id") Integer id, @PathVariable("fileNumber") Integer fileNumber){
-        List<Resource> resources = postService.getFiles(id);
-        if(fileNumber > resources.size()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    public CommonResponse<Post> getPostById(@PathVariable("id") Integer id){
+        Post postResponse = null;
+        try{
+            postResponse = postService.findById(id);
+        } catch(Exception e){
+            return commonResponseGenerator.errorResponse(null, e.getMessage());
         }
-        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment").body(resources.get(fileNumber-1));
+        return commonResponseGenerator.successResponse(postResponse, "Get Post Success");
     }
     
     @GetMapping("/getAll")
-    public List<PostDto> getAll(){
-        return postService.getAllPostsDto();
+    public CommonResponse<List<PostDto>> getAll(){
+
+        List<PostDto> postResponse = null;
+        try{
+            postResponse = postService.getAllPostsDto();
+        }catch(Exception e){
+            return commonResponseGenerator.errorResponse(null, e.getMessage());
+        }
+        return commonResponseGenerator.successResponse(postResponse, "Get Post List Success");
     }
 
 }   
