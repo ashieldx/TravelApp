@@ -101,7 +101,7 @@ public class FileService{
     public void deleteFile(String url){
         Path path = FileSystems.getDefault().getPath(url);
         try{
-            Files.delete(path);
+            Files.deleteIfExists(path);
         }catch(IOException e){
             throw new RuntimeException("Error deleting File: " + e.getMessage());
         }

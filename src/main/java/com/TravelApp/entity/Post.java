@@ -35,8 +35,14 @@ public class Post {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "city")
+    private String city;
+
     @Column(name  = "address")
     private String address;
+
+    @Column(name = "parking")
+    private String parking;
 
     @Column(name = "phone_number")
     private String phoneNumber;

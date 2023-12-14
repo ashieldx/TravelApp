@@ -41,6 +41,8 @@ public class SecurityConfiguration {
             .requestMatchers(mvcMatcherBuilder.pattern("/error")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern("/auth/**")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern("/admin/**")).hasAuthority("ADMIN")
+            .requestMatchers(mvcMatcherBuilder.pattern("/category/admin/**")).hasAuthority("ADMIN")
+            .requestMatchers(mvcMatcherBuilder.pattern("/post/admin/**")).hasAuthority("ADMIN")
             .anyRequest().authenticated()
         )
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

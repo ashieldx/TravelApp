@@ -69,7 +69,7 @@ public class PostController {
     public CommonResponse<Report> createReport(@AuthenticationPrincipal User user, @PathVariable("id") Integer id, @RequestBody ReportDto report){
         Report reportResponse = null;
         try{
-            reportResponse = reportService.createReport(user, id, report.getMessage());
+            reportResponse = reportService.createReport(user, id, report.getMessage(), report.getType());
         }catch(Exception e){
             return commonResponseGenerator.errorResponse(null, e.getMessage());
         }
@@ -81,8 +81,10 @@ public class PostController {
         @RequestParam("data") String claimString) throws JsonMappingException, JsonProcessingException{  
         Claim claim = new ObjectMapper().readValue(claimString, Claim.class);
         Claim claimResponse = null;
+
+        String desc = claim.getDescription();
         try{
-            claimResponse = claimService.claimPost(user, claim, id, files);
+            claimResponse = claimService.claimPost(user, desc, id, files);
         }catch (Exception e){
             return commonResponseGenerator.errorResponse(null, e.getMessage());
         }
@@ -135,6 +137,28 @@ public class PostController {
         }
         return commonResponseGenerator.successResponse(postResponse, "Get Post List Success");
     }
+
+    @PostMapping("/search")
+    public CommonResponse<List<PostDto>> search(@RequestBody Post post){
+        List<PostDto> postResponse = null;
+        try{
+            postResponse = postService.search(post);
+        }catch (Exception e){
+            return commonResponseGenerator.errorResponse(null, "Search By Criteria Error");
+        }
+        return commonResponseGenerator.successResponse(postResponse, "Search by Criteria Success");
+    }
+
+    @DeleteMapping("/admin/delete/{id}")
+    public CommonResponse<String> deletePost(@PathVariable("id") Integer id){
+        try{
+            postService.deletePostByAdmin(id);
+        }catch(Exception e){
+            return commonResponseGenerator.errorResponse(null, e.getMessage());
+        }
+        return commonResponseGenerator.successResponse("Post Deleted", "Delete Post by Admin Success");
+    }
+    
 
 }   
 

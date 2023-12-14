@@ -3,7 +3,6 @@ package com.TravelApp.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,27 +10,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.TravelApp.entity.Category;
+import com.TravelApp.dto.RequestDto;
 import com.TravelApp.entity.Claim;
 import com.TravelApp.entity.Report;
 import com.TravelApp.response.CommonResponse;
 import com.TravelApp.response.CommonResponseGenerator;
-import com.TravelApp.service.CategoryService;
 import com.TravelApp.service.ClaimService;
 import com.TravelApp.service.FileService;
-import com.TravelApp.service.PostService;
 import com.TravelApp.service.ReportService;
 
 
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
-
-    @Autowired
-    private PostService postService;
-
-    @Autowired
-    private CategoryService categoryService;
 
     @Autowired
     private ReportService reportService;
@@ -45,30 +36,7 @@ public class AdminController {
     @Autowired
     private CommonResponseGenerator commonResponseGenerator;
 
-    //POST
-    @DeleteMapping("/delete/{id}")
-    public CommonResponse<String> deletePost(@PathVariable("id") Integer id){
-        try{
-            postService.deletePostByAdmin(id);
-        }catch(Exception e){
-            return commonResponseGenerator.errorResponse(null, e.getMessage());
-        }
-        return commonResponseGenerator.successResponse("Post Deleted", "Delete Post by Admin Success");
-    }
-
-    //NOT TESTED
-    @PostMapping("/createCategory")
-    public CommonResponse<Category> createCategory(@RequestBody Category category){
-        Category categoryResponse = null;
-        try{
-            categoryResponse = categoryService.createCategory(category);;
-        }catch (Exception e){
-            return commonResponseGenerator.errorResponse(null , "Failed to Create Category");
-        }
-        return commonResponseGenerator.errorResponse(categoryResponse, "Create Category Success");
-    }
-
-    //Get All User Reports
+    //Reports
     @GetMapping("/getUserReports")
     public CommonResponse<List<Report>> getUserReports(){
         List<Report> reportResponse = null;
@@ -81,11 +49,11 @@ public class AdminController {
     }
 
     //View, Approve, Reject Claims
-    @GetMapping("/claim/getAll")
-    public CommonResponse<List<Claim>> getAllClaims(){
+    @PostMapping("/claim/getAll")
+    public CommonResponse<List<Claim>> getAllClaims(@RequestBody RequestDto requestDto){
         List<Claim> claimResponse = null;
         try{
-            claimResponse = claimService.getAllClaims();
+            claimResponse = claimService.getAllClaims(requestDto.getString());
         } catch(Exception e){
             return commonResponseGenerator.errorResponse(null , "Failed to Retrieve Claims");
         }
@@ -100,18 +68,18 @@ public class AdminController {
         }catch(Exception e){
             return commonResponseGenerator.errorResponse(null, "Error Approve Claim");
         }
-        return commonResponseGenerator.errorResponse(claimResponse, "Approve Claim Success");
+        return commonResponseGenerator.successResponse(claimResponse, "Approve Claim Success");
     }
 
-    @GetMapping("claim/reject/{id}")
-    public CommonResponse<Claim> rejectClaim(@PathVariable("id") Integer id){
+    @PostMapping("claim/reject/{id}")
+    public CommonResponse<Claim> rejectClaim(@PathVariable("id") Integer id, @RequestBody RequestDto requestDto){
         Claim claimResponse = null;
         try{
-            claimResponse = claimService.rejectClaim(id);
+            claimResponse = claimService.rejectClaim(id, requestDto.getString());
         }catch(Exception e){
             return commonResponseGenerator.errorResponse(null, "Error Reject Claim");
         }
-        return commonResponseGenerator.errorResponse(claimResponse, "Reject Claim Success");
+        return commonResponseGenerator.successResponse(claimResponse, "Reject Claim Success");
     }
 
     //Send chat to user

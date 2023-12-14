@@ -18,6 +18,7 @@ import com.TravelApp.entity.User;
 import com.TravelApp.repository.PostDetailRepository;
 import com.TravelApp.repository.PostRepository;
 import com.TravelApp.repository.ReviewRepository;
+import com.TravelApp.specification.PostSpecification;
 import com.TravelApp.util.ErrorMessage;
 
 @Service
@@ -76,6 +77,8 @@ public class PostService {
         post.setDescription(newPost.getDescription());
         post.setPostDetails(newPost.getPostDetails());
         post.setAddress(newPost.getAddress());
+        post.setCity(newPost.getCity());
+        post.setParking(newPost.getParking());
         post.setOpeningHour(newPost.getOpeningHour());
         post.setClosingHour(newPost.getClosingHour());
         post.setPhoneNumber(newPost.getPhoneNumber());
@@ -106,12 +109,11 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    public List<PostDto> getAllPostsDto(){
-        List<Post> posts = postRepository.findAll();
+    //Function to convert Post List -> Post List Dto 
+    public List<PostDto> convertToDto(List<Post> post){
         List<PostDto> postDtoList = new ArrayList<PostDto>();
-        
-        //map Post to PostDto for preview
-        for(Post i : posts){
+
+        for(Post i : post){
             float rating = 0, rounded = 0;
             Integer totalRating = reviewRepository.getPostTotalRating(i.getId());
             if(totalRating > 0){
@@ -122,17 +124,23 @@ public class PostService {
                 i.getTitle(), 
                 i.getDescription(), 
                 (i.getPostDetails().size() == 0 ? 
-                    "No Image" : 
+                    "Not Found" : 
                     i.getPostDetails().get(0).getUrl()+
                     i.getPostDetails().get(0).getFileName()),
-                i.getCreatedDate(), 
-                i.getEditFlag(), 
+                i.getCategory().getCategory(),
+                i.getCity(),
+                i.getCreatedDate(),
                 rounded, 
                 totalRating
                 )
             );
         }
         return postDtoList;
+    }
+
+    public List<PostDto> search(Post postSearch){
+        List<Post> posts = postRepository.findAll(PostSpecification.findBySpecification(postSearch));
+        return convertToDto(posts);
     }
 
     public Post findById(Integer id) throws ErrorMessage{
@@ -145,6 +153,11 @@ public class PostService {
 
     public List<Post> getAll(){
         return postRepository.findAll();
+    }
+
+    public List<PostDto> getAllPostsDto(){
+        List<Post> posts = postRepository.findAll();
+        return convertToDto(posts);
     }
 
     public List<Resource> getFiles(Integer postId){
@@ -174,17 +187,14 @@ public class PostService {
     }
 
     /* ADMIN SIDE */
-
-    public String deletePostByAdmin(Integer id) throws ErrorMessage{
-
+    public void deletePostByAdmin(Integer id) throws ErrorMessage{
         //send Notification to user
         Post post = postRepository.findById(id).get();
-        
         if(post != null){
             deletePost(post.getUser(), id);
-            return "SUCCESS DELETE";
+            return;
         }
-        return "FAILED TO DELETE POST";
+        throw new ErrorMessage("Failed to delete Post");
     }
 
 }

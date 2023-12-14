@@ -44,6 +44,8 @@ public class UserController {
         return commonResponseGenerator.successResponse(noticationResponse, "Get User Notification List Success");
     }
 
+    //Get Liked Posts By User
+
     @GetMapping("/getAll")
     public List<User> getAll(){
         return userService.getAll();

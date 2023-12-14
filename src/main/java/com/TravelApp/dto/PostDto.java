@@ -13,14 +13,11 @@ public class PostDto {
     private Integer id;
     private String title;
     private String description;
-    private String fileName;
+    private String fileUrl;
+    private String category;
+    private String city;
     private LocalDateTime createdDate;
-    private boolean approveFlag;
 
     private float averageRating;
     private int totalRating;
-
-    public boolean getApproveFlag(){
-        return this.approveFlag;
-    }
 }

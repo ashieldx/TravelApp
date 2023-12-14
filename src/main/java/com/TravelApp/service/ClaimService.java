@@ -34,14 +34,16 @@ public class ClaimService {
     private static final String REJECTED_CLAIM_STATUS = "RJCTD";
     private static final String FILE_URL = "uploads/claim-details/";
 
-    public Claim claimPost(User user, Claim claim, Integer postId, MultipartFile[] files){
+    public Claim claimPost(User user, String message, Integer postId, MultipartFile[] files){       
         Post post = postRepository.findById(postId).get();
         LocalDateTime currTime = LocalDateTime.now();
 
+        Claim claim = new Claim();
         claim.setUser(user);
         claim.setPost(post);
         claim.setStatus(NEW_CLAIM_STATUS);
         claim.setCreatedDate(currTime);
+        claim.setDescription(message);
 
         List<ClaimDetails> claimDetails = new ArrayList<>();
         Arrays.asList(files).stream().forEach(file-> {
@@ -67,19 +69,24 @@ public class ClaimService {
         return claimRepository.save(claim);
     }
 
-    public List<Claim> getAllClaims(){
-        return claimRepository.findAll();
+    public List<Claim> getAllClaims(String status){
+        if(status.equalsIgnoreCase("ALL")){
+            return claimRepository.findAll();
+        }
+        return claimRepository.findByStatus(status);
     }
 
     public Claim approveClaim(Integer claimId){
         Claim claim = claimRepository.findById(claimId).get();
         claim.setStatus(APPROVED_CLAIM_STATUS);
+        claim.setComments("Your Claim has been Approved!");
         return claimRepository.save(claim);
     }
 
-    public Claim rejectClaim(Integer claimId){
+    public Claim rejectClaim(Integer claimId, String message){
         Claim claim = claimRepository.findById(claimId).get();
         claim.setStatus(REJECTED_CLAIM_STATUS);
+        claim.setComments(message);
         return claimRepository.save(claim);
     }
 
