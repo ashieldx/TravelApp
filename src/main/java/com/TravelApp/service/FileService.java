@@ -24,9 +24,11 @@ import com.TravelApp.util.ErrorMessage;
 @Service
 public class FileService{
 
-    private final Path postRoot = Paths.get("uploads/post-details");
-    private final Path reviewRoot = Paths.get("uploads/review-details");
-    private final Path claimRoot = Paths.get("uploads/claim-details");
+    private final String MAIN_PATH = "uploads";
+    private final Path postRoot = Paths.get(MAIN_PATH + "/post-details");
+    private final Path reviewRoot = Paths.get(MAIN_PATH + "/review-details");
+    private final Path claimRoot = Paths.get(MAIN_PATH + "claim-details");
+    private final Path profileRoot = Paths.get(MAIN_PATH + "profile");
 
     private static final long MAX_FILE_SIZE = 10485760;
 
@@ -77,14 +79,32 @@ public class FileService{
         }
     }
 
+    public String save(MultipartFile file, String username){
+        final String url = "uploads/profile/";
+        final Path root = Paths.get(url);
+        String filename;
+        try{
+            filename = username + file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+            Files.copy(file.getInputStream(),
+                root.resolve(Objects.requireNonNull(filename)));
+        }catch(Exception e){
+            throw new RuntimeException("Error creating File: " + e.getMessage());
+        }
+        return (url+filename);
+    }
+
     public void validateFiles(MultipartFile[] files) throws ErrorMessage{
         for(MultipartFile i : files){
-            if(!this.validateFileType(i)){
-                throw new ErrorMessage("Invalid file Type!");
+            this.validateFile(i);
+        }
+    }
+
+    public void validateFile(MultipartFile file) throws ErrorMessage{
+        if(!this.validateFileType(file)){
+            throw new ErrorMessage("Invalid file Type!");
             }
-            if(i.getSize() > MAX_FILE_SIZE){
-                throw new ErrorMessage("Files(s) too large!");
-            }
+        if(file.getSize() > MAX_FILE_SIZE){
+            throw new ErrorMessage("Files(s) too large!");
         }
     }
 
@@ -99,22 +119,23 @@ public class FileService{
     }
 
     public void deleteFile(String url){
-        Path path = FileSystems.getDefault().getPath(url);
-        try{
-            Files.deleteIfExists(path);
-        }catch(IOException e){
-            throw new RuntimeException("Error deleting File: " + e.getMessage());
+        if(url != null && !url.isEmpty()){
+            Path path = FileSystems.getDefault().getPath(url);
+            try{
+                Files.deleteIfExists(path);
+            }catch(IOException e){
+                throw new RuntimeException("Error deleting File: " + e.getMessage());
+            }
         }
     }
 
     public void flushAllFiles(){
+        System.out.println("==START FLUSH FILES==");
         Arrays.stream(new File(postRoot.toString()).listFiles()).forEach(File::delete);
         Arrays.stream(new File(reviewRoot.toString()).listFiles()).forEach(File::delete);
         Arrays.stream(new File(claimRoot.toString()).listFiles()).forEach(File::delete);
+        Arrays.stream(new File(profileRoot.toString()).listFiles()).forEach(File::delete);
+        System.out.println("==END  FLUSH  FILES==");
     }
-
-
-
-
     
 }

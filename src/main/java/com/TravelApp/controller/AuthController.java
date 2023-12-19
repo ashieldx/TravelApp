@@ -9,7 +9,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.TravelApp.config.JwtService;
 import com.TravelApp.dto.AuthResponse;
@@ -20,7 +22,11 @@ import com.TravelApp.repository.TokenRepository;
 import com.TravelApp.repository.UserRepository;
 import com.TravelApp.response.CommonResponse;
 import com.TravelApp.response.CommonResponseGenerator;
+import com.TravelApp.service.FileService;
 import com.TravelApp.util.ErrorMessage;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping("/auth")
@@ -40,13 +46,17 @@ public class AuthController {
     private JwtService jwtService;
 
     @Autowired
+    private FileService fileService;
+
+    @Autowired
     private AuthenticationManager authenticationManager;
 
     @Autowired
     private CommonResponseGenerator commonResponseGenerator;
 
     @PostMapping("/register")
-    public CommonResponse<AuthResponse> register(@RequestBody User userRequest) throws ErrorMessage{
+    public CommonResponse<AuthResponse> register(@RequestParam("data") String userString, @RequestParam("file") MultipartFile file) throws ErrorMessage, JsonMappingException, JsonProcessingException{
+        User userRequest = new ObjectMapper().readValue(userString, User.class);
         //Validation for duplicate username
         if(userRepository.findFirstByUsername(userRequest.getUsername()) != null){
             return commonResponseGenerator.errorResponse(null, "Username already Exist");
@@ -54,10 +64,21 @@ public class AuthController {
 
         String encrypted = passwordEncoder.encode(userRequest.getPassword());
         userRequest.setPassword(encrypted);
+
+        try{
+            fileService.validateFile(file);
+            String filename = fileService.save(file, userRequest.getUsername());
+            userRequest.setProfileUrl(filename);
+        }catch(Exception e){
+            commonResponseGenerator.errorResponse(null, "Error Saving File");
+        }
+
+        userRequest.setFullName(userRequest.getFullName());
+        userRequest.setPhone(userRequest.getPhone());
         userRequest.setRole("USER");
         userRequest.setCreatedDate(LocalDateTime.now());
-        User savedUser = userRepository.save(userRequest);   
-
+        User savedUser = userRepository.save(userRequest);
+     
         String jwtToken = jwtService.generateToken(userRequest);
         saveToken(savedUser, jwtToken);
 
