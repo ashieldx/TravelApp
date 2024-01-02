@@ -32,14 +32,14 @@ public class FileService{
 
     private static final long MAX_FILE_SIZE = 10485760;
 
-    public Resource getFileByName(String filename, String url) {
+    public Resource getFileByName(String filename, String urlPartial) {
+        String url = MAIN_PATH + "/" + urlPartial;
         try{
             Path rootPath = Paths.get(url);
             Path filePath = rootPath.resolve(filename);
             Resource resource = new UrlResource(filePath.toUri());
             if(resource.exists() || resource.isReadable()){
                 return resource;
-                
             }
             else{
                 throw new RuntimeException("Cannot read File(s) ");

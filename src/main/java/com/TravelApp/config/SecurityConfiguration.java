@@ -40,6 +40,7 @@ public class SecurityConfiguration {
         .authorizeHttpRequests(req -> req
             .requestMatchers(mvcMatcherBuilder.pattern("/error")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern("/auth/**")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern("/uploads/**")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern("/admin/**")).hasAuthority("ADMIN")
             .requestMatchers(mvcMatcherBuilder.pattern("/category/admin/**")).hasAuthority("ADMIN")
             .requestMatchers(mvcMatcherBuilder.pattern("/post/admin/**")).hasAuthority("ADMIN")
