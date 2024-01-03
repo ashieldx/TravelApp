@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.TravelApp.dto.ReviewSortDto;
 import com.TravelApp.entity.Review;
 import com.TravelApp.entity.User;
 import com.TravelApp.response.CommonResponse;
@@ -65,11 +65,11 @@ public class ReviewController {
         return commonResponseGenerator.successResponse(reviewResponse, "Edit Review Success");
     }
 
-    @GetMapping("/get/{id}")
-    public CommonResponse<List<Review>> getPostReviews(@PathVariable("id") Integer id, @RequestBody Review reviewFilter){
+    @PostMapping("/get/{id}")
+    public CommonResponse<List<Review>> getPostReviews(@PathVariable("id") Integer id, @RequestBody ReviewSortDto sortDto){
         List<Review> reviewResponse = null;
         try{
-            reviewResponse = reviewService.getPostReviews(id, reviewFilter);
+            reviewResponse = reviewService.getPostReviews(id, sortDto);
         }catch(Exception e){
             return commonResponseGenerator.errorResponse(null, "Failed to Retrive Reviews");
         }

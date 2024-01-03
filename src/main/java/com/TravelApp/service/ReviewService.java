@@ -6,9 +6,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.TravelApp.dto.ReviewSortDto;
 import com.TravelApp.entity.Like;
 import com.TravelApp.entity.Review;
 import com.TravelApp.entity.ReviewDetails;
@@ -175,9 +177,17 @@ public class ReviewService {
         return reviewRepository.save(review);
     }
 
-    public List<Review> getPostReviews(int id, Review reviewFilter){
-        //List<Review>
-        return reviewRepository.findByPostId(id);
+    public List<Review> getPostReviews(int id, ReviewSortDto sortDto){
+        Sort sort = null;
+        if(sortDto.getField() != null && sortDto.getDirection() != null){
+            if(sortDto.getDirection().equalsIgnoreCase("ASC")){
+                sort = Sort.by(Sort.Direction.ASC, sortDto.getField());
+            }
+            else{
+                sort = Sort.by(Sort.Direction.DESC, sortDto.getField());
+            }
+        }
+        return reviewRepository.findByPostId(id, sort);
     }
 
     public String deleteReview(User user, Integer reviewId) throws ErrorMessage{
