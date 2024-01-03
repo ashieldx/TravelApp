@@ -175,7 +175,8 @@ public class ReviewService {
         return reviewRepository.save(review);
     }
 
-    public List<Review> getPostReviews(int id){
+    public List<Review> getPostReviews(int id, Review reviewFilter){
+        //List<Review>
         return reviewRepository.findByPostId(id);
     }
 

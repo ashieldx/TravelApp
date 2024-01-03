@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -65,10 +66,10 @@ public class ReviewController {
     }
 
     @GetMapping("/get/{id}")
-    public CommonResponse<List<Review>> getPostReviews(@PathVariable("id") Integer id){
+    public CommonResponse<List<Review>> getPostReviews(@PathVariable("id") Integer id, @RequestBody Review reviewFilter){
         List<Review> reviewResponse = null;
         try{
-            reviewResponse = reviewService.getPostReviews(id);
+            reviewResponse = reviewService.getPostReviews(id, reviewFilter);
         }catch(Exception e){
             return commonResponseGenerator.errorResponse(null, "Failed to Retrive Reviews");
         }
