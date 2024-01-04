@@ -30,7 +30,7 @@ public class FileService{
     private final Path claimRoot = Paths.get(MAIN_PATH + "claim-details");
     private final Path profileRoot = Paths.get(MAIN_PATH + "profile");
 
-    private static final long MAX_FILE_SIZE = 10485760;
+    private static final long MAX_FILE_SIZE = 1048576000;
 
     public Resource getFileByName(String filename, String urlPartial) {
         String url = MAIN_PATH + "/" + urlPartial;

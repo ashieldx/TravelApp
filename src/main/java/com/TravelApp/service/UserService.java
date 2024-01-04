@@ -56,5 +56,10 @@ public class UserService {
         }
     }
 
+    public List<User> findUsers(List<Integer> userIdList){
+        return userRepository.findAllById(userIdList);
+
+    }
+
 
 }

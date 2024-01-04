@@ -10,7 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.TravelApp.dto.ReviewSortDto;
+import com.TravelApp.dto.SortDto;
 import com.TravelApp.entity.Like;
 import com.TravelApp.entity.Review;
 import com.TravelApp.entity.ReviewDetails;
@@ -33,6 +33,9 @@ public class ReviewService {
 
     @Autowired
     private LikeRepository likeRepository;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private FileService fileService;
@@ -177,7 +180,7 @@ public class ReviewService {
         return reviewRepository.save(review);
     }
 
-    public List<Review> getPostReviews(int id, ReviewSortDto sortDto){
+    public List<Review> getPostReviews(int id, SortDto sortDto){
         Sort sort = null;
         if(sortDto.getField() != null && sortDto.getDirection() != null){
             if(sortDto.getDirection().equalsIgnoreCase("ASC")){
@@ -188,6 +191,17 @@ public class ReviewService {
             }
         }
         return reviewRepository.findByPostId(id, sort);
+    }
+
+    public List<User> getUsersLikedReview(int id){
+        List<Like> likeList = likeRepository.findByReviewId(id);
+
+        List<Integer> userIdList = new ArrayList<Integer>();
+        for(Like i : likeList){
+            userIdList.add(i.getUserId());
+        }
+        
+        return userService.findUsers(userIdList);
     }
 
     public String deleteReview(User user, Integer reviewId) throws ErrorMessage{

@@ -7,7 +7,7 @@ import lombok.Setter;
 @Data
 @Getter
 @Setter
-public class ReviewSortDto {
+public class SortDto {
 
     private String field;
     private String direction;

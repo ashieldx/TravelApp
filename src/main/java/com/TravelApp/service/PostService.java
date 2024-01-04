@@ -3,6 +3,8 @@ package com.TravelApp.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -138,9 +140,34 @@ public class PostService {
         return postDtoList;
     }
 
-    public List<PostDto> search(Post postSearch){
+    public List<PostDto> search(Post postSearch, String sortBy, String sortDir){
         List<Post> posts = postRepository.findAll(PostSpecification.findBySpecification(postSearch));
-        return convertToDto(posts);
+
+        List<PostDto> postDtoList = convertToDto(posts);
+
+        if(sortBy.equalsIgnoreCase("createdDate")){
+            Collections.sort(postDtoList, new Comparator<PostDto>() {
+                public int compare(PostDto a, PostDto b){
+                    return a.getCreatedDate().compareTo(b.getCreatedDate());
+                } 
+            });
+        }
+        else if(sortBy.equalsIgnoreCase("rating")){
+            Collections.sort(postDtoList, new Comparator<PostDto>() {
+                public int compare(PostDto a, PostDto b){
+                    return Float.compare(a.getAverageRating(), b.getAverageRating());
+                } 
+            });
+        }
+        else if(sortBy.equalsIgnoreCase("reviews")){
+            Collections.sort(postDtoList, (a,b)-> a.getTotalRating()-b.getTotalRating());
+        }
+
+        if(sortDir.equalsIgnoreCase("DESC")){
+            Collections.reverse(postDtoList);
+        }
+
+        return postDtoList;
     }
 
     public Post findById(Integer id) throws ErrorMessage{
@@ -186,6 +213,7 @@ public class PostService {
         throw new ErrorMessage("Post Belongs To Another User");
     }
 
+
     /* ADMIN SIDE */
     public void deletePostByAdmin(Integer id) throws ErrorMessage{
         //send Notification to user
@@ -196,5 +224,7 @@ public class PostService {
         }
         throw new ErrorMessage("Failed to delete Post");
     }
+
+
 
 }

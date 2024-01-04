@@ -139,15 +139,16 @@ public class PostController {
     }
 
     @PostMapping("/search")
-    public CommonResponse<List<PostDto>> search(@RequestBody Post post){
+    public CommonResponse<List<PostDto>> search(@RequestBody Post post, @RequestParam String sortBy, @RequestParam String sortDir){
         List<PostDto> postResponse = null;
-        try{
-            postResponse = postService.search(post);
+        try{      
+            postResponse = postService.search(post, sortBy, sortDir);
         }catch (Exception e){
             return commonResponseGenerator.errorResponse(null, "Search By Criteria Error");
         }
         return commonResponseGenerator.successResponse(postResponse, "Search by Criteria Success");
     }
+
 
     @DeleteMapping("/admin/delete/{id}")
     public CommonResponse<String> deletePost(@PathVariable("id") Integer id){
