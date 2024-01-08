@@ -57,6 +57,14 @@ public class User implements UserDetails{
     @Column(name = "profile_url")
     private String profileUrl;
 
+    @Column(name = "latitude")
+    @ColumnDefault("0")
+    private double latitude;
+
+    @Column(name = "longtitude")
+    @ColumnDefault("0")
+    private double longtitude;
+
     @Column(name = "is_active")
     @ColumnDefault("true")
     private boolean isActive;

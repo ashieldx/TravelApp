@@ -13,6 +13,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.TravelApp.dto.GeolocationRequest;
 import com.TravelApp.dto.PostDto;
 import com.TravelApp.entity.Post;
 import com.TravelApp.entity.PostDetails;
@@ -36,6 +37,9 @@ public class PostService {
 
     @Autowired
     private ReviewRepository reviewRepository;
+
+    @Autowired
+    private GeolocationService geolocationService;
 
     private static final String FILE_URL = "uploads/post-details/";
 
@@ -135,7 +139,10 @@ public class PostService {
                 i.getCreatedDate(),
                 rounded, 
                 totalRating,
-                 totalRatingThisMonth
+                totalRatingThisMonth,
+                i.getLatitude(),
+                i.getLongtitude(),
+                0
                 )
             );
         }
@@ -178,6 +185,20 @@ public class PostService {
             return post.get();
         }
         throw new ErrorMessage("Post Not Found");
+    }
+    
+    //find Nearest by Location
+    public List<PostDto> findNearest(User user, GeolocationRequest geolocationRequest){
+        List<PostDto> postList = this.getAllPostsDto();
+        geolocationService.setUserLocation(user, geolocationRequest);
+
+        for(PostDto i : postList){
+            double distance = geolocationService.calculateDistance(geolocationRequest, i.getLatitude(), i.getLongtitude());
+            i.setDistance(distance);
+        }
+
+        Collections.sort(postList, Comparator.comparingDouble(PostDto::getDistance));
+        return postList;
     }
 
 

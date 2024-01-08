@@ -53,13 +53,13 @@ public class Post {
     @Column(name = "closing_hour")
     private String closingHour;
 
-    @Column(name = "longtitude")
-    @ColumnDefault("0")
-    private double longtitude;
-
     @Column(name = "latitude")
     @ColumnDefault("0")
     private double latitude;
+
+    @Column(name = "longtitude")
+    @ColumnDefault("0")
+    private double longtitude;
 
     @Column(name = "created_date")
     private LocalDateTime createdDate;

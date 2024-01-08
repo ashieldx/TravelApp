@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.TravelApp.dto.GeolocationRequest;
 import com.TravelApp.dto.PostDto;
 import com.TravelApp.dto.ReportDto;
 import com.TravelApp.entity.Claim;
@@ -150,7 +151,20 @@ public class PostController {
         return commonResponseGenerator.successResponse(postResponse, "Search by Criteria Success");
     }
 
-    //Most reviews in 1 month
+    //find Nearest location
+    @PostMapping("/findNearest")
+    public CommonResponse<List<PostDto>> findNearest(@AuthenticationPrincipal User user, @RequestBody GeolocationRequest geolocationRequest){
+        List<PostDto> postResponse = null;
+        try{
+            postResponse = postService.findNearest(user, geolocationRequest);
+        }catch(Exception e){
+            return commonResponseGenerator.errorResponse(null, "Failed to Find Nearest Place");
+        }
+        return commonResponseGenerator.successResponse(postResponse, "Find Nearest Place Success");
+    }
+
+
+    //Most Reviews this Month
     @GetMapping("/getTrending/{limit}")
     public CommonResponse<List<PostDto>> getTrending(@PathVariable(name = "limit") Optional<Integer> limit) {
         int actualLimit = limit.orElse(8);
@@ -162,8 +176,6 @@ public class PostController {
         }
         return commonResponseGenerator.successResponse(postResponse, "Get Top Rated This Month Success");
     }
-    
-
 
     @DeleteMapping("/admin/delete/{id}")
     public CommonResponse<String> deletePost(@PathVariable("id") Integer id){

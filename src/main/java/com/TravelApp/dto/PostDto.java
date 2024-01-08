@@ -21,4 +21,8 @@ public class PostDto {
     private float averageRating;
     private int totalRating;
     private int totalRatingThisMonth;
+
+    private double latitude;
+    private double longtitude;
+    private double distance;
 }
