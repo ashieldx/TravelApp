@@ -1,12 +1,12 @@
 package com.TravelApp.service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.TravelApp.dto.NotificationDto;
 import com.TravelApp.entity.Notification;
 import com.TravelApp.entity.Post;
 import com.TravelApp.entity.Review;
@@ -41,8 +41,12 @@ public class NoticationService {
     @Autowired
     private ReviewRepository reviewRepository;
 
-    public List<Notification> getAllUserNotificaton(User user){
-        return notificationRepository.findByUserId(user.getId());
+    public NotificationDto getAllUserNotificaton(User user){
+        NotificationDto notificationDto = new NotificationDto();
+        notificationDto.setUnread(notificationRepository.countUnreadNotificationsForUser(user.getId()));
+        notificationDto.setTotalCount(notificationRepository.countAllNotificationsForUser(user.getId()));
+        notificationDto.setNotification(notificationRepository.findByUserId(user.getId()));
+        return notificationDto;
     }
 
     public Notification createReviewNotification(User user, Integer postId){

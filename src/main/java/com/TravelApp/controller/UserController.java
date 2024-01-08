@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.TravelApp.entity.Notification;
+import com.TravelApp.dto.NotificationDto;
 import com.TravelApp.entity.User;
 import com.TravelApp.response.CommonResponse;
 import com.TravelApp.response.CommonResponseGenerator;
@@ -57,8 +57,8 @@ public class UserController {
     }
 
     @GetMapping("/getUserNotifications")
-    public CommonResponse<List<Notification>> getUserNotifications(@AuthenticationPrincipal User user){
-        List<Notification> noticationResponse = null;
+    public CommonResponse<NotificationDto> getUserNotifications(@AuthenticationPrincipal User user){
+        NotificationDto noticationResponse = null;
         try{
             noticationResponse = noticationService.getAllUserNotificaton(user);
         }catch(Exception e){
@@ -67,8 +67,7 @@ public class UserController {
         return commonResponseGenerator.successResponse(noticationResponse, "Get User Notification List Success");
     }
 
-    //Get Liked Posts By User
-
+    //ADMIN ONLY - GET ALL USER DATA
     @GetMapping("/getAll")
     public List<User> getAll(){
         return userService.getAll();
