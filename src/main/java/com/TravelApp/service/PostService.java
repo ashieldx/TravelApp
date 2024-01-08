@@ -201,15 +201,10 @@ public class PostService {
         return postList;
     }
 
-
     public List<PostDto> getMostRatingThisMonth(Integer limit){
         List<PostDto> postList = this.getAllPostsDto();
         postList.sort(Comparator.comparingInt(PostDto::getTotalRatingThisMonth));
         return postList.subList(0, limit);
-    }
-
-    public List<Post> getAll(){
-        return postRepository.findAll();
     }
 
     public List<PostDto> getAllPostsDto(){
@@ -244,7 +239,7 @@ public class PostService {
     }
 
 
-    /* ADMIN SIDE */
+    //ADMIN ONLY
     public void deletePostByAdmin(Integer id) throws ErrorMessage{
         //send Notification to user
         Post post = postRepository.findById(id).get();

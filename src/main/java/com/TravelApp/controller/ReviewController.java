@@ -81,7 +81,7 @@ public class ReviewController {
     public CommonResponse<Review> likeReview(@AuthenticationPrincipal User user, @PathVariable("id") Integer reviewId){
         Review reviewResponse = null;
         try{
-            reviewService.likeReview(user.getId(), reviewId);
+            reviewResponse = reviewService.likeReview(user.getId(), reviewId);
         }catch(Exception e){
             return commonResponseGenerator.errorResponse(null, e.getMessage());
         }
@@ -92,7 +92,7 @@ public class ReviewController {
     public CommonResponse<Review> dislikeReview(@AuthenticationPrincipal User user, @PathVariable("id") Integer reviewId){
         Review reviewResponse = null;
         try{
-            reviewService.likeReview(user.getId(), reviewId);
+            reviewResponse = reviewService.dislikeReview(user.getId(), reviewId);
         }catch(Exception e){
             return commonResponseGenerator.errorResponse(null, e.getMessage());
         }
