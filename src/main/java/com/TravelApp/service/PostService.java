@@ -33,10 +33,10 @@ public class PostService {
     private PostDetailRepository postDetailRepository;
 
     @Autowired
-    private FileService fileService;
+    private ReviewRepository reviewRepository;
 
     @Autowired
-    private ReviewRepository reviewRepository;
+    private FileService fileService;
 
     @Autowired
     private GeolocationService geolocationService;
@@ -154,7 +154,7 @@ public class PostService {
 
         List<PostDto> postDtoList = convertToDto(posts);
 
-        if(sortBy.equalsIgnoreCase("createdDate")){
+        if(sortBy.equalsIgnoreCase("createdDate") || sortBy.isEmpty()){
             Collections.sort(postDtoList, new Comparator<PostDto>() {
                 public int compare(PostDto a, PostDto b){
                     return a.getCreatedDate().compareTo(b.getCreatedDate());
@@ -171,8 +171,16 @@ public class PostService {
         else if(sortBy.equalsIgnoreCase("reviews")){
             Collections.sort(postDtoList, (a,b)-> a.getTotalRating()-b.getTotalRating());
         }
+        else if(sortBy.equalsIgnoreCase("nearest")){
+            for(PostDto i : postDtoList){
+                double distance = geolocationService.calculateDistance(
+                    new GeolocationRequest("", postSearch.getLongtitude(), postSearch.getLatitude()), i.getLatitude(), i.getLongtitude());
+                i.setDistance(distance);
+            }
+            Collections.sort(postDtoList, Comparator.comparingDouble(PostDto::getDistance));
+        }
 
-        if(sortDir.equalsIgnoreCase("DESC")){
+        if(!sortDir.equalsIgnoreCase("ASC")){
             Collections.reverse(postDtoList);
         }
 
@@ -236,6 +244,12 @@ public class PostService {
             return true; 
         }
         throw new ErrorMessage("Post Belongs To Another User");
+    }
+
+    public Post claimPost(User user, Post post){
+        post.setUser(user);
+        post.setModifiedDate(LocalDateTime.now());
+        return postRepository.save(post);
     }
 
 

@@ -53,7 +53,7 @@ public class UserController {
         }catch(Exception e){
             return commonResponseGenerator.errorResponse(null, "Failed to Edit Profile");
         }
-        return commonResponseGenerator.errorResponse(userResponse, "Edit User Success");
+        return commonResponseGenerator.successResponse(userResponse, "Edit User Success");
     }
 
     @GetMapping("/getUserNotifications")
@@ -69,7 +69,14 @@ public class UserController {
 
     //ADMIN ONLY - GET ALL USER DATA
     @GetMapping("/getAll")
-    public List<User> getAll(){
-        return userService.getAll();
+    public CommonResponse<List<User>> getAll(){
+        List<User> users = null;
+        try{
+            users = userService.getAll();
+        }catch(Exception e){
+            return commonResponseGenerator.errorResponse(null, "Failed to User List");
+        }
+        return commonResponseGenerator.successResponse(users, "Get User List Success");
+
     }
 }

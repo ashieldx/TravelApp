@@ -29,6 +29,9 @@ public class ClaimService {
     @Autowired
     private FileService fileService;
 
+    @Autowired
+    private PostService postService;
+
     private static final String NEW_CLAIM_STATUS = "NEW";
     private static final String APPROVED_CLAIM_STATUS = "APRVD";
     private static final String REJECTED_CLAIM_STATUS = "RJCTD";
@@ -80,6 +83,9 @@ public class ClaimService {
         Claim claim = claimRepository.findById(claimId).get();
         claim.setStatus(APPROVED_CLAIM_STATUS);
         claim.setComments("Your Claim has been Approved!");
+
+        //Set Claimed Post to NEW User
+        postService.claimPost(claim.getUser(), claim.getPost());
         return claimRepository.save(claim);
     }
 

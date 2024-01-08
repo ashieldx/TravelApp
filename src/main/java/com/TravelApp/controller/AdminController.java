@@ -37,7 +37,7 @@ public class AdminController {
     private CommonResponseGenerator commonResponseGenerator;
 
     //Reports
-    @GetMapping("/getUserReports")
+    @GetMapping("/report/get")
     public CommonResponse<List<Report>> getUserReports(){
         List<Report> reportResponse = null;
         try{
@@ -45,7 +45,18 @@ public class AdminController {
         }catch (Exception e){
             return commonResponseGenerator.errorResponse(null, "Failed to Retrieve Reports");
         }
-       return commonResponseGenerator.errorResponse(reportResponse, "Get Report List Success");
+       return commonResponseGenerator.successResponse(reportResponse, "Get Report List Success");
+    }
+
+    @GetMapping("/report/process/{id}")
+    public CommonResponse<Report> processReport(@PathVariable("id") Integer id){
+        Report reportResponse = null;
+        try{
+            reportResponse = reportService.processReport(id);
+        }catch(Exception e){
+            return commonResponseGenerator.errorResponse(null, "Failed to Process Report");
+        }
+        return commonResponseGenerator.successResponse(reportResponse, "Process Report Success");
     }
 
     //View, Approve, Reject Claims
@@ -82,7 +93,7 @@ public class AdminController {
         return commonResponseGenerator.successResponse(claimResponse, "Reject Claim Success");
     }
 
-    //Send chat to user
+
 
 
 
