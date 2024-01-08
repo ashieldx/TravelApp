@@ -118,6 +118,7 @@ public class PostService {
         for(Post i : post){
             float rating = 0, rounded = 0;
             Integer totalRating = reviewRepository.getPostTotalRating(i.getId());
+            Integer totalRatingThisMonth = reviewRepository.getPostTotalRatingThisMonth(i.getId());
             if(totalRating > 0){
                 rating = reviewRepository.getPostAverageRating(i.getId());
             }
@@ -133,7 +134,8 @@ public class PostService {
                 i.getCity(),
                 i.getCreatedDate(),
                 rounded, 
-                totalRating
+                totalRating,
+                 totalRatingThisMonth
                 )
             );
         }
@@ -176,6 +178,13 @@ public class PostService {
             return post.get();
         }
         throw new ErrorMessage("Post Not Found");
+    }
+
+
+    public List<PostDto> getMostRatingThisMonth(Integer limit){
+        List<PostDto> postList = this.getAllPostsDto();
+        postList.sort(Comparator.comparingInt(PostDto::getTotalRatingThisMonth));
+        return postList.subList(0, limit);
     }
 
     public List<Post> getAll(){

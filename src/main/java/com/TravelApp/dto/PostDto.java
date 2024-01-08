@@ -20,4 +20,5 @@ public class PostDto {
 
     private float averageRating;
     private int totalRating;
+    private int totalRatingThisMonth;
 }

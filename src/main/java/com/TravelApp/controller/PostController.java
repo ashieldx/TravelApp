@@ -1,6 +1,7 @@
 package com.TravelApp.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -148,6 +149,20 @@ public class PostController {
         }
         return commonResponseGenerator.successResponse(postResponse, "Search by Criteria Success");
     }
+
+    //Most reviews in 1 month
+    @GetMapping("/getTrending/{limit}")
+    public CommonResponse<List<PostDto>> getTrending(@PathVariable(name = "limit") Optional<Integer> limit) {
+        int actualLimit = limit.orElse(8);
+        List<PostDto> postResponse = null;
+        try{
+            postResponse = postService.getMostRatingThisMonth(actualLimit);
+        }catch(Exception e){
+            return commonResponseGenerator.errorResponse(null, e.getMessage());
+        }
+        return commonResponseGenerator.successResponse(postResponse, "Get Top Rated This Month Success");
+    }
+    
 
 
     @DeleteMapping("/admin/delete/{id}")
