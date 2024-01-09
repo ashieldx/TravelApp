@@ -23,7 +23,7 @@ import com.TravelApp.util.ErrorMessage;
 @Service
 public class ReviewService {
     @Autowired
-    private NotificationService  noticationService;
+    private NotificationService  notificationService;
 
     @Autowired
     private ReviewRepository reviewRepository;
@@ -73,7 +73,7 @@ public class ReviewService {
         });
 
         review.setReviewDetails(reviewDetails);
-        noticationService.createReviewNotification(user, postId);
+        notificationService.createReviewNotification(user, postId);
         return reviewRepository.save(review);
     }
     
@@ -127,17 +127,17 @@ public class ReviewService {
             newLike.setAction(LIKE);
             newLike.setCreatedDate(currTime);
             likeRepository.save(newLike);
-            noticationService.createLikeNotification(userId, reviewId);
+            notificationService.createLikeNotification(userId, reviewId);
         }
         else if(like.getAction().equals(DISLIKE)){
             like.setAction(LIKE);
             like.setCreatedDate(currTime);
             likeRepository.save(like);
-            noticationService.createLikeNotification(userId, reviewId);
+            notificationService.createLikeNotification(userId, reviewId);
         }
         else{
             likeRepository.delete(like);
-            noticationService.deleteLikeNotification(userId, reviewId);
+            notificationService.deleteLikeNotification(userId, reviewId);
         }
 
 
@@ -171,7 +171,7 @@ public class ReviewService {
             likeRepository.delete(like);
         }
 
-        noticationService.deleteLikeNotification(userId, reviewId);
+        notificationService.deleteLikeNotification(userId, reviewId);
         Integer likeCount = likeRepository.getLikeOrDislikeCount(reviewId, LIKE);
         Integer dislikeCount = likeRepository.getLikeOrDislikeCount(reviewId, DISLIKE);
         review.setLikes(likeCount); 
