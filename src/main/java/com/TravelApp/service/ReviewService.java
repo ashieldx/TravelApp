@@ -23,7 +23,7 @@ import com.TravelApp.util.ErrorMessage;
 @Service
 public class ReviewService {
     @Autowired
-    private NoticationService  noticationService;
+    private NotificationService  noticationService;
 
     @Autowired
     private ReviewRepository reviewRepository;
