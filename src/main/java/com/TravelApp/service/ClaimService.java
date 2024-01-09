@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -72,11 +74,11 @@ public class ClaimService {
         return claimRepository.save(claim);
     }
 
-    public List<Claim> getAllClaims(String status){
+    public Page<Claim> getAllClaims(Pageable pageable, String status){
         if(status.equalsIgnoreCase("ALL")){
-            return claimRepository.findAll();
+            return claimRepository.findAll(pageable);
         }
-        return claimRepository.findByStatus(status);
+        return claimRepository.findByStatus(pageable, status);
     }
 
     public Claim approveClaim(Integer claimId){

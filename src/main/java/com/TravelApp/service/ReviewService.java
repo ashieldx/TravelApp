@@ -6,11 +6,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.TravelApp.dto.SortDto;
 import com.TravelApp.entity.Like;
 import com.TravelApp.entity.Review;
 import com.TravelApp.entity.ReviewDetails;
@@ -180,17 +180,8 @@ public class ReviewService {
         return reviewRepository.save(review);
     }
 
-    public List<Review> getPostReviews(int id, SortDto sortDto){
-        Sort sort = null;
-        if(sortDto.getField() != null && sortDto.getDirection() != null){
-            if(sortDto.getDirection().equalsIgnoreCase("ASC")){
-                sort = Sort.by(Sort.Direction.ASC, sortDto.getField());
-            }
-            else{
-                sort = Sort.by(Sort.Direction.DESC, sortDto.getField());
-            }
-        }
-        return reviewRepository.findByPostId(id, sort);
+    public Page<Review> getPostReviews(int id, Pageable pageable){
+        return reviewRepository.findByPostId(id, pageable);
     }
 
     public List<User> getUsersLikedReview(int id){

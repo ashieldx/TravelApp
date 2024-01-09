@@ -1,9 +1,10 @@
 package com.TravelApp.service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.TravelApp.entity.Post;
@@ -22,8 +23,8 @@ public class ReportService {
     private ReportRepository reportRepository;
 
     //get all reports (admin)
-    public List<Report> getAll(){
-        return reportRepository.findAll();
+    public Page<Report> getAll(Pageable pageable){
+        return reportRepository.findAll(pageable);
     }
 
     public Report createReport(User user, Integer postId, String message, String type) throws ErrorMessage{

@@ -3,19 +3,21 @@ package com.TravelApp.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.TravelApp.dto.SortDto;
 import com.TravelApp.entity.Review;
 import com.TravelApp.entity.User;
 import com.TravelApp.response.CommonResponse;
@@ -66,11 +68,26 @@ public class ReviewController {
         return commonResponseGenerator.successResponse(reviewResponse, "Edit Review Success");
     }
 
-    @PostMapping("/get/{id}")
-    public CommonResponse<List<Review>> getPostReviews(@PathVariable("id") Integer id, @RequestBody SortDto sortDto){
-        List<Review> reviewResponse = null;
+    @GetMapping("/get/{id}")
+    public CommonResponse<Page<Review>> getPostReviews(
+        @PathVariable("id") Integer postId, 
+        @RequestParam(name = "sortBy", defaultValue = "createdDate") String sortBy,
+        @RequestParam(name = "sortDir", defaultValue = "desc") String sortDir,
+        @RequestParam(name = "page", defaultValue = "0") int page,
+        @RequestParam(name = "size", defaultValue =  "5") int size
+        ){
+        Page<Review> reviewResponse = null;
         try{
-            reviewResponse = reviewService.getPostReviews(id, sortDto);
+            Sort sort = null;
+            if(sortDir.equalsIgnoreCase("asc")){    
+                sort = Sort.by(sortBy).ascending();
+            }
+            else{
+                sort = Sort.by(sortBy).descending();
+            }
+            Pageable pageable = PageRequest.of(page, size, sort);
+            
+            reviewResponse = reviewService.getPostReviews(postId, pageable);
         }catch(Exception e){
             return commonResponseGenerator.errorResponse(null, "Failed to Retrive Reviews");
         }

@@ -1,8 +1,7 @@
 package com.TravelApp.repository;
 
-import java.util.List;
-
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,7 +20,7 @@ public interface ReviewRepository extends JpaRepository<Review, Integer>{
     @Query(value = "SELECT COUNT(*) FROM mst_review WHERE post_id = :postId AND MONTH(created_date) = MONTH(CURRENT_DATE) AND YEAR(created_date) = YEAR(CURRENT_DATE)", nativeQuery = true)
     int getPostTotalRatingThisMonth(@Param("postId") Integer postId);
 
-    List<Review> findByPostId(Integer postId, Sort sort);
+    Page<Review> findByPostId(Integer postId, Pageable pageable);
 
     Review findByPostIdAndUsername(Integer postId, String username);
 }
