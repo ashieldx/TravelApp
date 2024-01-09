@@ -1,12 +1,14 @@
 package com.TravelApp.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.TravelApp.dto.NotificationDto;
 import com.TravelApp.entity.Notification;
 import com.TravelApp.entity.Post;
 import com.TravelApp.entity.Review;
@@ -18,7 +20,7 @@ import com.TravelApp.repository.UserRepository;
 
 
 @Service
-public class NoticationService {
+public class NotificationService {
 
     public static final String USER_NOTIFICATION_LIKE = "LIKE";
     public static final String USER_NOTIFICATION_REVIEW = "REVIEW";
@@ -41,12 +43,16 @@ public class NoticationService {
     @Autowired
     private ReviewRepository reviewRepository;
 
-    public NotificationDto getAllUserNotificaton(User user){
-        NotificationDto notificationDto = new NotificationDto();
-        notificationDto.setUnread(notificationRepository.countUnreadNotificationsForUser(user.getId()));
-        notificationDto.setTotalCount(notificationRepository.countAllNotificationsForUser(user.getId()));
-        notificationDto.setNotification(notificationRepository.findByUserId(user.getId()));
-        return notificationDto;
+    public Page<Notification> getAllUserNotificaton(User user, Pageable pageable){
+        return notificationRepository.findByUserId(user.getId(), pageable);
+    }
+
+    public List<Notification> markAllNotificationAsRead(User user){
+        List<Notification> notifications = notificationRepository.findByUserId(user.getId());
+        for(Notification i : notifications){
+            i.setRead(true);
+        }
+        return notificationRepository.saveAll(notifications);
     }
 
     public Notification createReviewNotification(User user, Integer postId){

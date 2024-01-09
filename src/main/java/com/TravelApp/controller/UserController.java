@@ -11,12 +11,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.TravelApp.dto.NotificationDto;
 import com.TravelApp.entity.User;
 import com.TravelApp.response.CommonResponse;
 import com.TravelApp.response.CommonResponseGenerator;
 import com.TravelApp.service.FileService;
-import com.TravelApp.service.NoticationService;
 import com.TravelApp.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -31,9 +29,6 @@ public class UserController {
 
     @Autowired
     private FileService fileService;
-
-    @Autowired
-    private NoticationService noticationService;
 
     @Autowired
     private CommonResponseGenerator commonResponseGenerator;
@@ -54,17 +49,6 @@ public class UserController {
             return commonResponseGenerator.errorResponse(null, "Failed to Edit Profile");
         }
         return commonResponseGenerator.successResponse(userResponse, "Edit User Success");
-    }
-
-    @GetMapping("/getUserNotifications")
-    public CommonResponse<NotificationDto> getUserNotifications(@AuthenticationPrincipal User user){
-        NotificationDto noticationResponse = null;
-        try{
-            noticationResponse = noticationService.getAllUserNotificaton(user);
-        }catch(Exception e){
-            return commonResponseGenerator.errorResponse(null, "Failed to Retreive User Notifications");
-        }
-        return commonResponseGenerator.successResponse(noticationResponse, "Get User Notification List Success");
     }
 
     //ADMIN ONLY - GET ALL USER DATA

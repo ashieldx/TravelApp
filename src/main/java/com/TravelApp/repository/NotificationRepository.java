@@ -2,6 +2,8 @@ package com.TravelApp.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -10,7 +12,9 @@ import com.TravelApp.entity.Notification;
 
 public interface NotificationRepository extends JpaRepository<Notification, Integer>{
     
+    Page<Notification> findByUserId(Integer userId, Pageable pageable);
     List<Notification> findByUserId(Integer userId);
+
     Notification findBySenderIdAndReviewId(Integer senderId, Integer reviewId);
     Notification findBySenderIdAndPostId(Integer senderId, Integer postId);
 
