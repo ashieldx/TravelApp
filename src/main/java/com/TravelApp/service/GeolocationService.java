@@ -10,12 +10,12 @@ import com.TravelApp.repository.UserRepository;
 @Service
 public class GeolocationService {
 
+    public static final double EARTH_RADIUS = 6371.0;
+
     @Autowired
     private UserRepository userRepository;
 
     public double calculateDistance(GeolocationRequest geolocationRequest, double latitude, double longtitude) {
-        double earthRadius = 6371.0;
-
         double radRequestLat = Math.toRadians(geolocationRequest.getLatitude());
         double radRequestLong = Math.toRadians(geolocationRequest.getLongtitude());
         double radLat = Math.toRadians(latitude);
@@ -28,7 +28,7 @@ public class GeolocationService {
 
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-        return earthRadius * c;
+        return EARTH_RADIUS * c;
     }
 
     public User setUserLocation(User user, GeolocationRequest geolocationRequest){

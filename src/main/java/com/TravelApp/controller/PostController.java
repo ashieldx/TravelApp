@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -141,10 +142,11 @@ public class PostController {
     }
 
     @PostMapping("/search")
-    public CommonResponse<List<PostDto>> search(@RequestBody Post post, @RequestParam String sortBy, @RequestParam String sortDir){
-        List<PostDto> postResponse = null;
+    public CommonResponse<Page<PostDto>> search(@RequestBody Post post, @RequestParam String sortBy, @RequestParam String sortDir,
+        @RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "10") int size){
+        Page<PostDto> postResponse = null;
         try{      
-            postResponse = postService.search(post, sortBy, sortDir);
+            postResponse = postService.search(post, sortBy, sortDir, page, size);
         }catch (Exception e){
             return commonResponseGenerator.errorResponse(null, "Search By Criteria Error");
         }

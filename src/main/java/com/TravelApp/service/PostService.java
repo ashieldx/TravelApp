@@ -10,6 +10,9 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -149,7 +152,7 @@ public class PostService {
         return postDtoList;
     }
 
-    public List<PostDto> search(Post postSearch, String sortBy, String sortDir){
+    public Page<PostDto> search(Post postSearch, String sortBy, String sortDir, int page, int size){
         List<Post> posts = postRepository.findAll(PostSpecification.findBySpecification(postSearch));
 
         List<PostDto> postDtoList = convertToDto(posts);
@@ -184,7 +187,14 @@ public class PostService {
             Collections.reverse(postDtoList);
         }
 
-        return postDtoList;
+        int start = page*size;
+        int end = Math.min(start+size, postDtoList.size());
+        if(start > postDtoList.size()) {
+            return new PageImpl<>(List.of()); 
+        }
+
+        List<PostDto> subList = postDtoList.subList(start, end);
+        return new PageImpl<>(subList, PageRequest.of(page,size), postDtoList.size());
     }
 
     public Post findById(Integer id) throws ErrorMessage{
