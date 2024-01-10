@@ -84,7 +84,7 @@ public class NotificationService {
         notification.setCategory(USER_NOTIFICATION_LIKE);
         notification.setMessage(user.getUsername() + USER_NOTIFICATION_LIKE_DESC);
 
-        User reviewUser = userRepository.findFirstByUsername(review.getUsername());
+        User reviewUser = userRepository.findFirstByUsername(review.getUser().getUsername());
 
         //receiver user
         notification.setUserId(reviewUser.getId());

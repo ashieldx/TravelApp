@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.TravelApp.dto.GeolocationRequest;
 import com.TravelApp.dto.PostDto;
 import com.TravelApp.dto.ReportDto;
+import com.TravelApp.dto.SortDto;
 import com.TravelApp.entity.Claim;
 import com.TravelApp.entity.Post;
 import com.TravelApp.entity.Report;
@@ -142,11 +143,11 @@ public class PostController {
     }
 
     @PostMapping("/search")
-    public CommonResponse<Page<PostDto>> search(@RequestBody Post post, @RequestParam String sortBy, @RequestParam String sortDir,
+    public CommonResponse<Page<PostDto>> search(@RequestBody SortDto sortDto, @RequestParam String sortBy, @RequestParam String sortDir,
         @RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "10") int size){
         Page<PostDto> postResponse = null;
         try{      
-            postResponse = postService.search(post, sortBy, sortDir, page, size);
+            postResponse = postService.search(sortDto, sortBy, sortDir, page, size);
         }catch (Exception e){
             return commonResponseGenerator.errorResponse(null, "Search By Criteria Error");
         }

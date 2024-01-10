@@ -5,29 +5,32 @@ import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
 
-import com.TravelApp.entity.Post;
+import com.TravelApp.dto.SortDto;
 
 import jakarta.persistence.criteria.Predicate;
 
 public class PostSpecification {
     
-    public static Specification<Post> findBySpecification(Post postSearch){
-        return ((root, query, critriaBuilder) -> {
+    public static Specification<SortDto> findBySpecification(SortDto postSearch){
+        return ((root, query, criteriaBuilder) -> {
             List<Predicate> predicate = new ArrayList<>();
 
-            if(postSearch.getCategory() != null){
-                predicate.add(critriaBuilder.equal(root.get("category"), postSearch.getCategory()));
+            for(String i : postSearch.getCities()){
+                System.out.println(i);
+            }
+            if(postSearch.getCategories() != null){
+                predicate.add(criteriaBuilder.in(root.get("category")).value(postSearch.getCategories()));
             }
 
             if(postSearch.getTitle() != null && !postSearch.getTitle().isEmpty()){
-                predicate.add(critriaBuilder.like(root.get("title"), "%"+postSearch.getTitle()+"%"));
+                predicate.add(criteriaBuilder.like(root.get("title"), "%"+postSearch.getTitle()+"%"));
             }
 
-            if(postSearch.getCity() != null && !postSearch.getCity().isEmpty()){
-                predicate.add(critriaBuilder.like(root.get("city"), "%"+postSearch.getCity()+"%"));
+            if(postSearch.getCities() != null && !postSearch.getCities().isEmpty()){
+                predicate.add(criteriaBuilder.in(root.get("city")).value(postSearch.getCities()));
             }
 
-            return critriaBuilder.and(predicate.toArray(new Predicate[0]));
+            return criteriaBuilder.and(predicate.toArray(new Predicate[0]));
         }
         );
     }

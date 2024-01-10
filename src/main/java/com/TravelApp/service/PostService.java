@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.TravelApp.dto.GeolocationRequest;
 import com.TravelApp.dto.PostDto;
+import com.TravelApp.dto.SortDto;
 import com.TravelApp.entity.Post;
 import com.TravelApp.entity.PostDetails;
 import com.TravelApp.entity.User;
@@ -152,8 +153,8 @@ public class PostService {
         return postDtoList;
     }
 
-    public Page<PostDto> search(Post postSearch, String sortBy, String sortDir, int page, int size){
-        List<Post> posts = postRepository.findAll(PostSpecification.findBySpecification(postSearch));
+    public Page<PostDto> search(SortDto sortDto, String sortBy, String sortDir, int page, int size){
+        List<Post> posts = postRepository.findAll(PostSpecification.findBySpecification(sortDto));
 
         List<PostDto> postDtoList = convertToDto(posts);
 
@@ -171,13 +172,16 @@ public class PostService {
                 } 
             });
         }
+        else if(sortBy.equalsIgnoreCase("trending")){
+            postDtoList.sort(Comparator.comparingInt(PostDto::getTotalRatingThisMonth));
+        }
         else if(sortBy.equalsIgnoreCase("reviews")){
             Collections.sort(postDtoList, (a,b)-> a.getTotalRating()-b.getTotalRating());
         }
         else if(sortBy.equalsIgnoreCase("nearest")){
             for(PostDto i : postDtoList){
                 double distance = geolocationService.calculateDistance(
-                    new GeolocationRequest("", postSearch.getLongtitude(), postSearch.getLatitude()), i.getLatitude(), i.getLongtitude());
+                    new GeolocationRequest("", sortDto.getLongtitude(), sortDto.getLatitude()), i.getLatitude(), i.getLongtitude());
                 i.setDistance(distance);
             }
             Collections.sort(postDtoList, Comparator.comparingDouble(PostDto::getDistance));

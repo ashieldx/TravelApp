@@ -32,7 +32,7 @@ public class Review {
     private Integer postId;
 
     @Column(name = "username")
-    private String username;
+    private User user;
 
     @Column(name = "description")
     private String description;

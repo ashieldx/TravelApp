@@ -56,14 +56,14 @@ public class ReviewService {
         review.setLikes(0);
         review.setDislikes(0);
         review.setPostId(postId);
-        review.setUsername(user.getUsername());
+        review.setUser(user);
 
         List<ReviewDetails> reviewDetails = new ArrayList<>();
         Arrays.asList(files).stream().forEach(file->{
             ReviewDetails reviewDetail = new ReviewDetails();
             reviewDetail.setOriginalFileName(file.getOriginalFilename());
             reviewDetail.setFileType(file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".")+1));
-            reviewDetail.setFileName(review.getPostId()+ "_R_" + review.getUsername() + "_" + reviewDetails.size() + "." + reviewDetail.getFileType());
+            reviewDetail.setFileName(review.getPostId()+ "_R_" + review.getUser().getUsername() + "_" + reviewDetails.size() + "." + reviewDetail.getFileType());
             reviewDetail.setReview(review);
             reviewDetail.setCreatedDate(currentTime);
             reviewDetail.setUrl(FILE_URL);
@@ -81,7 +81,7 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId).get();
         LocalDateTime currTime = LocalDateTime.now();
 
-        if(!review.getUsername().equals(user.getUsername())){
+        if(!review.getUser().equals(user)){
             //cannot edit review
             return review;
         }
@@ -102,7 +102,7 @@ public class ReviewService {
             ReviewDetails reviewDetail = new ReviewDetails();
             reviewDetail.setOriginalFileName(file.getOriginalFilename());
             reviewDetail.setFileType(file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".")+1));
-            reviewDetail.setFileName(review.getPostId()+ "_R_" + review.getUsername() + "_" + newReviewDetails.size() + "." + reviewDetail.getFileType());
+            reviewDetail.setFileName(review.getPostId()+ "_R_" + review.getUser().getUsername() + "_" + newReviewDetails.size() + "." + reviewDetail.getFileType());
             reviewDetail.setReview(review);
             reviewDetail.setCreatedDate(currTime);
             reviewDetail.setUrl(FILE_URL);
@@ -198,7 +198,7 @@ public class ReviewService {
     public String deleteReview(User user, Integer reviewId) throws ErrorMessage{
         Review review = reviewRepository.findById(reviewId).get();
     
-        if(review.getUsername() == null || review.getUsername().equals(user.getUsername())){
+        if(review.getUser() == null || review.getUser().equals(user)){
             List<ReviewDetails> reviewDetails = reviewDetailRepository.findByReview(review);
             for(ReviewDetails i : reviewDetails){
                 fileService.deleteFile(FILE_URL+i.getFileName());

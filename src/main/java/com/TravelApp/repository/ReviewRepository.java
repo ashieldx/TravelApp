@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.TravelApp.entity.Review;
+import com.TravelApp.entity.User;
 
 
 public interface ReviewRepository extends JpaRepository<Review, Integer>{
@@ -22,5 +23,5 @@ public interface ReviewRepository extends JpaRepository<Review, Integer>{
 
     Page<Review> findByPostId(Integer postId, Pageable pageable);
 
-    Review findByPostIdAndUsername(Integer postId, String username);
+    Review findByPostIdAndUser(Integer postId, User user);
 }

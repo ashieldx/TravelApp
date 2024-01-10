@@ -41,6 +41,7 @@ public class SecurityConfiguration {
             .requestMatchers(mvcMatcherBuilder.pattern("/error")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern("/auth/**")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern("/uploads/**")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern("/post/get/**")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern("/post/getTrending/**")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern("/post/search")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern("/review/get/**")).permitAll()
