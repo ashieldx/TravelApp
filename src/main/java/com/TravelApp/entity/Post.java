@@ -33,15 +33,15 @@ public class Post {
     @Column(name = "title")
     private String title;
 
-    @Column(name = "description")
     @Lob
+    @Column(name = "description", columnDefinition = "LONGTEXT")
     private String description;
 
     @Column(name = "city")
     private String city;
 
-    @Column(name  = "address")
     @Lob
+    @Column(name  = "address", columnDefinition = "LONGTEXT")
     private String address;
 
     @Column(name = "parking")

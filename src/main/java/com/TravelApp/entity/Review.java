@@ -36,8 +36,8 @@ public class Review {
     @ManyToOne
     private User user;
 
-    @Column(name = "description")
     @Lob
+    @Column(name = "description", columnDefinition = "LONGTEXT")
     private String description;
 
     @Column(name = "likes")

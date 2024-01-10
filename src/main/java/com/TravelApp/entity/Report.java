@@ -9,6 +9,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -25,9 +26,6 @@ public class Report {
     @GeneratedValue(strategy =  GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "")
-    private String type;
-
     //sender id
     @Column(name = "sender_id")
     private Integer senderId;
@@ -35,7 +33,8 @@ public class Report {
     @ManyToOne
     private Post post;
 
-    @Column(name = "message")
+    @Lob
+    @Column(name = "message", columnDefinition = "LONGTEXT")
     private String message;
 
     @Column(name = "created_date")
