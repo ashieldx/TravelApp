@@ -31,7 +31,6 @@ public class ReportService {
         Report report = new Report();
         Post post  = postService.findById(postId);
         
-        report.setType(type);
         report.setSenderId(user.getId());
         report.setPost(post);
         report.setMessage(message);
