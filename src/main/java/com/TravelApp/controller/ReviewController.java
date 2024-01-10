@@ -41,13 +41,16 @@ public class ReviewController {
     private CommonResponseGenerator commonResponseGenerator;
 
     @PostMapping("/post/{id}")
-    public CommonResponse<Review> postReview(@AuthenticationPrincipal User user, @PathVariable("id") Integer postId, @RequestParam("files") MultipartFile[] files, 
+    public CommonResponse<Review> postReview(@AuthenticationPrincipal User user, @PathVariable("id") Integer postId, 
+        @RequestParam(value = "files", required = false) MultipartFile[] files, 
         @RequestParam("data") String reviewString) throws JsonMappingException, JsonProcessingException{
         Review review = new ObjectMapper().readValue(reviewString, Review.class);
         Review reviewResponse = null;
-        try{
-            fileService.validateFiles(files);
-            reviewResponse =reviewService.postReview(user, postId, review, files);
+        try{ 
+            if(files != null){
+                fileService.validateFiles(files);   
+            }
+            reviewResponse = reviewService.postReview(user, postId, review, files);
         }catch (Exception e){
             return commonResponseGenerator.errorResponse(null, e.getMessage());
         }

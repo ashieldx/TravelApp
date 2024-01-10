@@ -59,20 +59,22 @@ public class ReviewService {
         review.setUser(user);
 
         List<ReviewDetails> reviewDetails = new ArrayList<>();
-        Arrays.asList(files).stream().forEach(file->{
-            ReviewDetails reviewDetail = new ReviewDetails();
-            reviewDetail.setOriginalFileName(file.getOriginalFilename());
-            reviewDetail.setFileType(file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".")+1));
-            reviewDetail.setFileName(review.getPostId()+ "_R_" + review.getUser().getUsername() + "_" + reviewDetails.size() + "." + reviewDetail.getFileType());
-            reviewDetail.setReview(review);
-            reviewDetail.setCreatedDate(currentTime);
-            reviewDetail.setUrl(FILE_URL);
+        if(files != null){
+            Arrays.asList(files).stream().forEach(file->{
+                ReviewDetails reviewDetail = new ReviewDetails();
+                reviewDetail.setOriginalFileName(file.getOriginalFilename());
+                reviewDetail.setFileType(file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".")+1));
+                reviewDetail.setFileName(review.getPostId()+ "_R_" + review.getUser().getUsername() + "_" + reviewDetails.size() + "." + reviewDetail.getFileType());
+                reviewDetail.setReview(review);
+                reviewDetail.setCreatedDate(currentTime);
+                reviewDetail.setUrl(FILE_URL);
 
-            fileService.save(file, reviewDetail);
-            reviewDetails.add(reviewDetail);
-        });
+                fileService.save(file, reviewDetail);
+                reviewDetails.add(reviewDetail);
+            });
+            review.setReviewDetails(reviewDetails);
+        }
 
-        review.setReviewDetails(reviewDetails);
         notificationService.createReviewNotification(user, postId);
         return reviewRepository.save(review);
     }
