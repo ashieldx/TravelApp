@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Images ###
+./uploads/claim-details/**
+./uploads/post-details/**
+./uploads/profile/**
+./uploads/review-details/**

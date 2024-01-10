@@ -53,6 +53,9 @@ public class AuthController {
         if(userRepository.findFirstByUsername(userRequest.getUsername()) != null){
             return commonResponseGenerator.errorResponse(null, "Username already Exist");
         }
+        if(userRepository.findFirstByEmail(userRequest.getEmail()) != null){
+            return commonResponseGenerator.errorResponse(null, "Email already Taken");
+        }
 
         String encrypted = passwordEncoder.encode(userRequest.getPassword());
         userRequest.setPassword(encrypted);

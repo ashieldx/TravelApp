@@ -41,6 +41,7 @@ public class Post {
     private String city;
 
     @Column(name  = "address")
+    @Lob
     private String address;
 
     @Column(name = "parking")

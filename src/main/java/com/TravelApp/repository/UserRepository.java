@@ -7,5 +7,6 @@ import com.TravelApp.entity.User;
 public interface UserRepository extends JpaRepository<User, Integer>{
    User findFirstByUsername(String username);
    User findFirstById(Integer id);
+   User findFirstByEmail(String email);
 }
 
