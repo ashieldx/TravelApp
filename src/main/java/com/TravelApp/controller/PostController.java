@@ -143,7 +143,7 @@ public class PostController {
     }
 
     @PostMapping("/search")
-    public CommonResponse<Page<PostDto>> search(@RequestBody SortDto sortDto, @RequestParam String sortBy, @RequestParam String sortDir,
+    public CommonResponse<Page<PostDto>> search(@RequestBody(required = false) SortDto sortDto, @RequestParam String sortBy, @RequestParam String sortDir,
         @RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "10") int size){
         Page<PostDto> postResponse = null;
         try{      

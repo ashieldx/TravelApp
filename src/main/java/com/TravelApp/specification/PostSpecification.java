@@ -15,9 +15,6 @@ public class PostSpecification {
         return ((root, query, criteriaBuilder) -> {
             List<Predicate> predicate = new ArrayList<>();
 
-            for(String i : postSearch.getCities()){
-                System.out.println(i);
-            }
             if(postSearch.getCategories() != null){
                 predicate.add(criteriaBuilder.in(root.get("category")).value(postSearch.getCategories()));
             }
