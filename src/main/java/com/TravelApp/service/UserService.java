@@ -31,6 +31,7 @@ public class UserService {
         user.setDOB(userRequest.getDOB());
         user.setPhone(userRequest.getPhone());
         user.setFullName(userRequest.getFullName());
+        user.setEmail(userRequest.getEmail());
 
         String filename = null;
         if(file != null){
@@ -59,6 +60,17 @@ public class UserService {
     public List<User> findUsers(List<Integer> userIdList){
         return userRepository.findAllById(userIdList);
 
+    }
+
+    public boolean validateEmailEdit(User userEdit, String email){
+        User user  = userRepository.findFirstByEmail(email);
+        if(user != null){
+            if(userEdit.equals(user)){
+                return true;
+            }
+            return false;
+        }
+        return true;
     }
 
 

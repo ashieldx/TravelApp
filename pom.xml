@@ -73,6 +73,11 @@
 			<artifactId>tomcat-jasper</artifactId>
 			<version>10.1.5</version>
 		</dependency>
+		<dependency>
+			<groupId>commons-validator</groupId>
+			<artifactId>commons-validator</artifactId>
+			<version>1.7</version> <!-- Use the latest version available -->
+		</dependency>
 	</dependencies>
 
 	<build>

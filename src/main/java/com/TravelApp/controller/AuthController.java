@@ -2,6 +2,7 @@ package com.TravelApp.controller;
 
 import java.time.LocalDateTime;
 
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,6 +29,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 @RequestMapping("/auth")
 public class AuthController {
     private static final String BEARER_TOKEN_CONSTANT = "BEARER";
+    private static final EmailValidator emailValidator = EmailValidator.getInstance();
 
     @Autowired
     private UserRepository userRepository;
@@ -55,6 +57,9 @@ public class AuthController {
         }
         if(userRepository.findFirstByEmail(userRequest.getEmail()) != null){
             return commonResponseGenerator.errorResponse(null, "Email already Taken");
+        }
+        if(!this.isEmailValid(userRequest.getEmail())){
+            return commonResponseGenerator.errorResponse(null, "Invalid Email Format");
         }
 
         String encrypted = passwordEncoder.encode(userRequest.getPassword());
@@ -112,6 +117,10 @@ public class AuthController {
             tokenRepository.save(existingToken);
         }
         return;
+    }
+
+    private boolean isEmailValid(String email){
+        return emailValidator.isValid(email);
     }
 
 }

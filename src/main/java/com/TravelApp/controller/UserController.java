@@ -2,6 +2,7 @@ package com.TravelApp.controller;
 
 import java.util.List;
 
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,6 +33,8 @@ public class UserController {
 
     @Autowired
     private CommonResponseGenerator commonResponseGenerator;
+
+    private static final EmailValidator emailValidator = EmailValidator.getInstance();
     
     @GetMapping("/get")
     public CommonResponse<User> getUser(@AuthenticationPrincipal User user){
@@ -44,6 +47,12 @@ public class UserController {
         User userResponse = null;
         try{
             fileService.validateFile(file);
+            if(!emailValidator.isValid(userRequest.getEmail())){
+                return commonResponseGenerator.errorResponse(null, "Invalid Email Format");
+            }
+            if(!userService.validateEmailEdit(user, userRequest.getEmail())){
+                return commonResponseGenerator.errorResponse(null, "Email Taken!");
+            }
             userResponse = userService.editProfile(user, userRequest, file);     
         }catch(Exception e){
             return commonResponseGenerator.errorResponse(null, "Failed to Edit Profile");
