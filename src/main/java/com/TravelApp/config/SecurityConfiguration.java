@@ -45,6 +45,7 @@ public class SecurityConfiguration {
             .requestMatchers(mvcMatcherBuilder.pattern("/post/getTrending/**")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern("/post/search")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern("/review/get/**")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern("/category/**")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern("/admin/**")).hasAuthority("ADMIN")
             .requestMatchers(mvcMatcherBuilder.pattern("/category/admin/**")).hasAuthority("ADMIN")
             .requestMatchers(mvcMatcherBuilder.pattern("/post/admin/**")).hasAuthority("ADMIN")
