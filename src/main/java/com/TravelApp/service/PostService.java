@@ -57,6 +57,7 @@ public class PostService {
         post.setCreatedDate(currentTime);
         post.setModifiedDate(currentTime);
 
+
         List<PostDetails> postDetails = new ArrayList<>();
         Arrays.asList(files).stream().forEach(file-> {
             PostDetails postDetail = new PostDetails();
@@ -145,7 +146,7 @@ public class PostService {
                 totalRating,
                 totalRatingThisMonth,
                 i.getLatitude(),
-                i.getLongtitude(),
+                i.getLongitude(),
                 0
                 )
             );

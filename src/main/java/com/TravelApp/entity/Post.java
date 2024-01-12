@@ -60,9 +60,9 @@ public class Post {
     @ColumnDefault("0")
     private double latitude;
 
-    @Column(name = "longtitude")
+    @Column(name = "longitude")
     @ColumnDefault("0")
-    private double longtitude;
+    private double longitude;
 
     @Column(name = "created_date")
     private LocalDateTime createdDate;
