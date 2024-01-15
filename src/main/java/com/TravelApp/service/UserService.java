@@ -3,9 +3,12 @@ package com.TravelApp.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.TravelApp.dto.PostDto;
 import com.TravelApp.entity.User;
 import com.TravelApp.repository.UserRepository;
 
@@ -18,6 +21,10 @@ public class UserService {
 
     @Autowired
     private FileService fileService;
+
+    @Autowired
+    private PostService postService;
+    
 
     public User saveUser(User user){
         return userRepository.save(user);
@@ -44,6 +51,11 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public Page<PostDto> getPostsByUser(String username, Pageable pageable){
+        User user = this.findByUsername(username);
+        return postService.getPostByUser(user, pageable);
+    }
+
     public void inactivateUser(User user){
         user.setActive(false);
         userRepository.save(user);
@@ -57,9 +69,12 @@ public class UserService {
         }
     }
 
+    public User findByUsername(String username){
+        return userRepository.findFirstByUsername(username);
+    }
+
     public List<User> findUsers(List<Integer> userIdList){
         return userRepository.findAllById(userIdList);
-
     }
 
     public boolean validateEmailEdit(User userEdit, String email){

@@ -64,13 +64,6 @@ public class ClaimService {
         });
 
         claim.setClaimDetails(claimDetails);
-
-        //auto rejection
-        if(claim.getPost().getUser().equals(user)){
-            claim.setStatus(REJECTED_CLAIM_STATUS);
-            claim.setComments("You cannot claim your Own Post!");
-        }
-
         return claimRepository.save(claim);
     }
 

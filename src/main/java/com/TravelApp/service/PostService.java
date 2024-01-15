@@ -13,6 +13,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -53,6 +54,7 @@ public class PostService {
         }
         
         LocalDateTime currentTime = LocalDateTime.now();
+        post.setCreator(user);
         post.setUser(user);
         post.setCreatedDate(currentTime);
         post.setModifiedDate(currentTime);
@@ -235,6 +237,24 @@ public class PostService {
         return convertToDto(posts);
     }
 
+    public Page<PostDto> getPostByUser(User user, Pageable pageable){
+        Page<Post> posts = postRepository.findByUser(user, pageable);
+        List<PostDto> postDtoList = convertToDto(posts.toList());
+
+        int page = pageable.getPageNumber();
+        int size = pageable.getPageSize();
+
+        int start = page*size;
+        int end = Math.min(start+size, postDtoList.size());
+        if(start > postDtoList.size()) {
+            return new PageImpl<>(List.of()); 
+        }
+
+        List<PostDto> subList = postDtoList.subList(start, end);
+        return new PageImpl<>(subList, PageRequest.of(page,size), postDtoList.size());
+
+    }
+
     public List<Resource> getFiles(Integer postId){
         List<Resource> resources = new ArrayList<>();
         Optional<Post> post = postRepository.findById(postId);
@@ -263,6 +283,7 @@ public class PostService {
 
     public Post claimPost(User user, Post post){
         post.setUser(user);
+        post.setVerified(true);
         post.setModifiedDate(LocalDateTime.now());
         return postRepository.save(post);
     }

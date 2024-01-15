@@ -74,6 +74,10 @@ public class Post {
     @ColumnDefault("false")
     private boolean editFlag;
 
+    @Column(name = "claim_flag")
+    @ColumnDefault("false")
+    private boolean verified;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<PostDetails> postDetails = new ArrayList<PostDetails>();
 
@@ -83,9 +87,13 @@ public class Post {
     @ManyToOne
     private User user;
 
+    @ManyToOne
+    private User creator;
+
     public boolean getEditFlag(){
         return this.editFlag;
     }
+
     
 
 
