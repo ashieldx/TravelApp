@@ -35,7 +35,8 @@ public class Claim {
     @Column(name = "status")
     private String status;
 
-    @Column(name = "comments")
+    @Lob
+    @Column(name = "comments", columnDefinition = "LONGTEXT")
     private String comments;
 
     @Column(name = "created_date")

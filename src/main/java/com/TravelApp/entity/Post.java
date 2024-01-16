@@ -50,10 +50,12 @@ public class Post {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "opening_hour")
+    @Lob
+    @Column(name = "opening_hour", columnDefinition = "LONGTEXT")
     private String openingHour;
 
-    @Column(name = "closing_hour")
+    @Lob
+    @Column(name = "closing_hour", columnDefinition = "LONGTEXT")
     private String closingHour;
 
     @Column(name = "latitude")

@@ -9,6 +9,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -44,7 +45,8 @@ public class Notification {
     @Column(name = "category")
     private String category;
 
-    @Column(name = "message")
+    @Lob
+    @Column(name = "message", columnDefinition = "LONGTEXT")
     private String message;
 
     @Column(name = "is_read")
