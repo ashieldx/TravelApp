@@ -3,6 +3,7 @@ package com.TravelApp.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.TravelApp.entity.Category;
@@ -14,7 +15,8 @@ public class CategoryService {
     private CategoryRepository categoryRepository;
 
     public List<Category> getAll(){
-        return categoryRepository.findAll();
+        Sort sort = Sort.by("category").ascending();
+        return categoryRepository.findAll(sort);
     }
 
     public Category createCategory(Category category){
