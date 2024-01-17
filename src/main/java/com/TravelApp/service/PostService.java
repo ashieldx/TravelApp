@@ -97,6 +97,11 @@ public class PostService {
         post.setPhoneNumber(newPost.getPhoneNumber());
         post.setModifiedDate(currentTime);
 
+        post.setAlias(newPost.getAlias());
+
+        post.setLatitude(newPost.getLatitude());
+        post.setLongitude(newPost.getLongitude());
+
         //remove old Files
         List<PostDetails> oldDetails = postDetailRepository.findByPost(post);
         for(PostDetails i : oldDetails){ 

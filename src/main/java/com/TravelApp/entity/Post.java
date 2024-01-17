@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import io.micrometer.common.lang.Nullable;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -32,6 +33,10 @@ public class Post {
 
     @Column(name = "title")
     private String title;
+
+    @Nullable
+    @Column(name = "alias")
+    private String alias;
 
     @Lob
     @Column(name = "description", columnDefinition = "LONGTEXT")

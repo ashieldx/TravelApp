@@ -20,7 +20,9 @@ public class PostSpecification {
             }
 
             if(postSearch.getTitle() != null && !postSearch.getTitle().isEmpty()){
-                predicate.add(criteriaBuilder.like(root.get("title"), "%"+postSearch.getTitle()+"%"));
+                Predicate titlePredicate = criteriaBuilder.like(root.get("title"), "%"+postSearch.getTitle()+"%");
+                Predicate aliasPredicaate = criteriaBuilder.like(root.get("alias"), "%"+postSearch.getTitle()+"%");
+                predicate.add(criteriaBuilder.or(titlePredicate, aliasPredicaate));
             }
 
             if(postSearch.getCities() != null && !postSearch.getCities().isEmpty()){
