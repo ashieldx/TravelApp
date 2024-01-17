@@ -174,6 +174,7 @@ public class PostService {
             });
         }
         else if(sortBy.equalsIgnoreCase("rating")){
+            Collections.sort(postDtoList, (a,b)-> a.getTotalRating()-b.getTotalRating());
             Collections.sort(postDtoList, new Comparator<PostDto>() {
                 public int compare(PostDto a, PostDto b){
                     return Float.compare(a.getAverageRating(), b.getAverageRating());
@@ -184,6 +185,11 @@ public class PostService {
             postDtoList.sort(Comparator.comparingInt(PostDto::getTotalRatingThisMonth));
         }
         else if(sortBy.equalsIgnoreCase("reviews")){
+            Collections.sort(postDtoList, new Comparator<PostDto>() {
+                public int compare(PostDto a, PostDto b){
+                    return Float.compare(a.getAverageRating(), b.getAverageRating());
+                } 
+            });
             Collections.sort(postDtoList, (a,b)-> a.getTotalRating()-b.getTotalRating());
         }
         else if(sortBy.equalsIgnoreCase("nearest")){
@@ -193,6 +199,9 @@ public class PostService {
                 i.setDistance(distance);
             }
             Collections.sort(postDtoList, Comparator.comparingDouble(PostDto::getDistance));
+        }
+        else if(sortBy.equalsIgnoreCase("alphabet")){
+            Collections.sort(postDtoList, Comparator.comparing(PostDto::getTitle));
         }
 
         if(!sortDir.equalsIgnoreCase("ASC")){
