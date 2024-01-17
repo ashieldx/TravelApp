@@ -33,7 +33,7 @@ build/
 .vscode/
 
 ### Images ###
-./uploads/claim-details/**
-./uploads/post-details/**
-./uploads/profile/**
-./uploads/review-details/**
+/uploads/claim-details/**
+/uploads/post-details/**
+/uploads/profile/**
+/uploads/review-details/**

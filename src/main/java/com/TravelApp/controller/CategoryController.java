@@ -34,7 +34,7 @@ public class CategoryController {
         try{
             categoryResponse = categoryService.createCategory(category);;
         }catch (Exception e){
-            return commonResponseGenerator.errorResponse(null , "Failed to Create Category");
+            return commonResponseGenerator.successResponse(null , "Failed to Create Category");
         }
         return commonResponseGenerator.errorResponse(categoryResponse, "Create Category Success");
     }
