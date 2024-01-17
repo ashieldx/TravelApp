@@ -44,6 +44,9 @@ public class PostService {
     private FileService fileService;
 
     @Autowired
+    private ClaimService claimService;
+
+    @Autowired
     private GeolocationService geolocationService;
 
     private static final String FILE_URL = "uploads/post-details/";
@@ -284,14 +287,22 @@ public class PostService {
         Post post = this.findById(postId);
 
         if(post.getUser().equals(user)){
+
+            //delete details
             List<PostDetails> postDetails = postDetailRepository.findByPost(post);
             for(PostDetails i : postDetails){
                 fileService.deleteFile(FILE_URL+i.getFileName());
             }
             postDetailRepository.deleteAll(postDetails);
-            postRepository.delete(post);    
+            postRepository.delete(post);  
+            
+            //delete claim & claim details
+            claimService.deleteClaim(post);
+            
             return true; 
         }
+
+        
         throw new ErrorMessage("Post Belongs To Another User");
     }
 

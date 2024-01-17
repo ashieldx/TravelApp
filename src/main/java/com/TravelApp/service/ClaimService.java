@@ -91,5 +91,10 @@ public class ClaimService {
         return claimRepository.save(claim);
     }
 
+    public void deleteClaim(Post post){
+        List<Claim> claims = claimRepository.findByPost(post);
+        claimRepository.deleteAll(claims);
+    }
+
     
 }
