@@ -187,7 +187,7 @@ public class ReviewService {
     }
 
     public List<User> getUsersLikedReview(int id){
-        List<Like> likeList = likeRepository.findByReviewId(id);
+        List<Like> likeList = likeRepository.findByReviewIdAndAction(id, LIKE);
 
         List<Integer> userIdList = new ArrayList<Integer>();
         for(Like i : likeList){

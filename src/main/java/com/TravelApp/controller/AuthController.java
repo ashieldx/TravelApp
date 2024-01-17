@@ -69,6 +69,7 @@ public class AuthController {
         userRequest.setPhone(userRequest.getPhone());
         userRequest.setRole("USER");
         userRequest.setCreatedDate(LocalDateTime.now());
+        userRequest.setProfileUrl("uploads/profile/default.jpg");
         User savedUser = userRepository.save(userRequest);
      
         String jwtToken = jwtService.generateToken(userRequest);

@@ -12,6 +12,8 @@ public interface LikeRepository extends JpaRepository<Like, Integer>{
     
     List<Like> findByReviewId(Integer reviewId);
 
+    List<Like> findByReviewIdAndAction(Integer reviewId, String action);
+
     @Query(value = "SELECT COUNT(*) FROM mst_review_like WHERE review_id = :reviewId AND action = :action", nativeQuery = true)
     public Integer getLikeOrDislikeCount(Integer reviewId, String action);
     
