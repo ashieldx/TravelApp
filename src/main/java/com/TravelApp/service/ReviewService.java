@@ -46,9 +46,9 @@ public class ReviewService {
     
     public Review postReview(User user, Integer postId, Review review, MultipartFile[] files) throws Exception{
 
-        // if(reviewRepository.findByPostIdAndUsername(postId, user.getUsername()) != null){
-        //     throw new Exception("You Already Reviewed This Post");
-        // }
+        if(reviewRepository.findByPostIdAndUser(postId, user) != null){
+            throw new Exception("You Already Reviewed This Post");
+        }
         
         LocalDateTime currentTime = LocalDateTime.now();
         review.setCreatedDate(currentTime);
