@@ -20,9 +20,11 @@ import org.springframework.web.multipart.MultipartFile;
 import com.TravelApp.dto.GeolocationRequest;
 import com.TravelApp.dto.PostDto;
 import com.TravelApp.dto.SortDto;
+import com.TravelApp.entity.Claim;
 import com.TravelApp.entity.Post;
 import com.TravelApp.entity.PostDetails;
 import com.TravelApp.entity.User;
+import com.TravelApp.repository.ClaimRepository;
 import com.TravelApp.repository.PostDetailRepository;
 import com.TravelApp.repository.PostRepository;
 import com.TravelApp.repository.ReviewRepository;
@@ -44,7 +46,7 @@ public class PostService {
     private FileService fileService;
 
     @Autowired
-    private ClaimService claimService;
+    private ClaimRepository claimRepository;
 
     @Autowired
     private GeolocationService geolocationService;
@@ -296,8 +298,8 @@ public class PostService {
             postDetailRepository.deleteAll(postDetails);
             postRepository.delete(post);  
             
-            //delete claim & claim details
-            claimService.deleteClaim(post);
+            List<Claim> claims = claimRepository.findByPost(post);
+            claimRepository.deleteAll(claims);
             
             return true; 
         }
