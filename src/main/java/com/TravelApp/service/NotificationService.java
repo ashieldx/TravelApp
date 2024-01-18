@@ -55,6 +55,12 @@ public class NotificationService {
         return notificationRepository.saveAll(notifications);
     }
 
+    public Notification readNotification(Integer notificationId){
+        Notification notification = notificationRepository.findById(notificationId).get();
+        notification.setRead(true);
+        return notificationRepository.save(notification);
+    }
+
     public Notification createReviewNotification(User user, Integer postId){
         Optional<Post> post = postRepository.findById(postId);
         

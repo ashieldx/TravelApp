@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,5 +56,17 @@ public class NotificationController {
         return commonResponseGenerator.successResponse(notificationResponse, "Read All Notification Success");
 
     }
+
+    @GetMapping("/read/{id}")
+    public CommonResponse<Notification> readNotification(@PathVariable("id") Integer notificationId) {
+        Notification notificationResponse = null;
+        try{
+            notificationResponse = notificationService.readNotification(notificationId);
+        }catch(Exception e){
+            return commonResponseGenerator.errorResponse(null, "Failed to Read  Notification");
+        }
+        return commonResponseGenerator.successResponse(notificationResponse, "Read Notification Success");
+    }
+    
     
 }
