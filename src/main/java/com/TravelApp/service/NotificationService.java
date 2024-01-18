@@ -57,6 +57,10 @@ public class NotificationService {
 
     public Notification createReviewNotification(User user, Integer postId){
         Optional<Post> post = postRepository.findById(postId);
+        
+        if(post.get().getUser().equals(user)){
+            return null;
+        }
 
         Notification notification = new Notification();
         notification.setCreatedDate(LocalDateTime.now());
@@ -78,6 +82,10 @@ public class NotificationService {
         User user  = userRepository.findFirstById(userId);
         Review review = reviewRepository.findById(reviewId).get();
 
+        if(review.getUser().equals(user)){
+            return null;
+        }
+
         Notification notification = new Notification();
         notification.setCreatedDate(LocalDateTime.now());
         notification.setTitle(USER_NOTIFICATION_LIKE_TITLE);
@@ -89,6 +97,7 @@ public class NotificationService {
         //receiver user
         notification.setUserId(reviewUser.getId());
         notification.setReviewId(reviewId);
+        notification.setPostId(review.getPostId());
 
         //sender user
         notification.setSenderId(userId);
