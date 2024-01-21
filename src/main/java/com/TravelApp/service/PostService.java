@@ -23,10 +23,12 @@ import com.TravelApp.dto.SortDto;
 import com.TravelApp.entity.Claim;
 import com.TravelApp.entity.Post;
 import com.TravelApp.entity.PostDetails;
+import com.TravelApp.entity.Report;
 import com.TravelApp.entity.User;
 import com.TravelApp.repository.ClaimRepository;
 import com.TravelApp.repository.PostDetailRepository;
 import com.TravelApp.repository.PostRepository;
+import com.TravelApp.repository.ReportRepository;
 import com.TravelApp.repository.ReviewRepository;
 import com.TravelApp.specification.PostSpecification;
 import com.TravelApp.util.ErrorMessage;
@@ -47,6 +49,9 @@ public class PostService {
 
     @Autowired
     private ClaimRepository claimRepository;
+
+    @Autowired
+    private ReportRepository reportRepository;
 
     @Autowired
     private GeolocationService geolocationService;
@@ -290,6 +295,14 @@ public class PostService {
 
         if(post.getUser().equals(user)){
 
+            //delete claims
+            List<Claim> claims = claimRepository.findByPost(post);
+            claimRepository.deleteAll(claims);
+            
+            //delete reports
+            List<Report> reports = reportRepository.findByPost(post);
+            reportRepository.deleteAll(reports);
+
             //delete details
             List<PostDetails> postDetails = postDetailRepository.findByPost(post);
             for(PostDetails i : postDetails){
@@ -297,9 +310,6 @@ public class PostService {
             }
             postDetailRepository.deleteAll(postDetails);
             postRepository.delete(post);  
-            
-            List<Claim> claims = claimRepository.findByPost(post);
-            claimRepository.deleteAll(claims);
             
             return true; 
         }
