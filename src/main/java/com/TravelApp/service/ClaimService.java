@@ -14,10 +14,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.TravelApp.entity.Claim;
 import com.TravelApp.entity.ClaimDetails;
-import com.TravelApp.entity.Post;
+import com.TravelApp.entity.Place;
 import com.TravelApp.entity.User;
 import com.TravelApp.repository.ClaimRepository;
-import com.TravelApp.repository.PostRepository;
+import com.TravelApp.repository.PlaceRepository;
 
 @Service
 public class ClaimService {
@@ -26,13 +26,13 @@ public class ClaimService {
     private ClaimRepository claimRepository;
 
     @Autowired
-    private PostRepository postRepository;
+    private PlaceRepository postRepository;
 
     @Autowired
     private FileService fileService;
 
     @Autowired
-    private PostService postService;
+    private PlaceService postService;
 
     private static final String NEW_CLAIM_STATUS = "NEW";
     private static final String APPROVED_CLAIM_STATUS = "APRVD";
@@ -40,7 +40,7 @@ public class ClaimService {
     private static final String FILE_URL = "uploads/claim-details/";
 
     public Claim claimPost(User user, String message, Integer postId, MultipartFile[] files){       
-        Post post = postRepository.findById(postId).get();
+        Place post = postRepository.findById(postId).get();
         LocalDateTime currTime = LocalDateTime.now();
 
         Claim claim = new Claim();
@@ -91,7 +91,7 @@ public class ClaimService {
         return claimRepository.save(claim);
     }
 
-    public void deleteClaim(Post post){
+    public void deleteClaim(Place post){
         List<Claim> claims = claimRepository.findByPost(post);
         claimRepository.deleteAll(claims);
     }

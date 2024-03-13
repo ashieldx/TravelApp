@@ -8,15 +8,15 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.TravelApp.dto.SortDto;
-import com.TravelApp.entity.Post;
+import com.TravelApp.entity.Place;
 import com.TravelApp.entity.User;
 
 
 
-public interface PostRepository extends JpaRepository<Post, Integer>{
-    Post findByTitle(String title);
+public interface PlaceRepository extends JpaRepository<Place, Integer>{
+    Place findByTitle(String title);
 
-    List<Post> findAll(Specification<SortDto> specification);
+    List<Place> findAll(Specification<SortDto> specification);
 
-    Page<Post> findByUser(User user, Pageable pageable);
+    Page<Place> findByUser(User user, Pageable pageable);
 }

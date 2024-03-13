@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.TravelApp.entity.Claim;
-import com.TravelApp.entity.Post;
+import com.TravelApp.entity.Place;
 
 import java.util.List;
 
@@ -14,5 +14,5 @@ import java.util.List;
 public interface ClaimRepository extends JpaRepository<Claim, Integer>{
     Page<Claim> findByStatus(Pageable pageable, String status);
 
-    List<Claim> findByPost(Post post);
+    List<Claim> findByPost(Place post);
 }

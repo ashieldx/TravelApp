@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.TravelApp.entity.ClaimDetails;
-import com.TravelApp.entity.PostDetails;
+import com.TravelApp.entity.PlaceDetails;
 import com.TravelApp.entity.ReviewDetails;
 import com.TravelApp.util.ErrorMessage;
 
@@ -49,7 +49,7 @@ public class FileService{
         }
     }
 
-    public void save(MultipartFile file, PostDetails postDetails) {
+    public void save(MultipartFile file, PlaceDetails postDetails) {
         try{
             Files.copy(file.getInputStream(), 
                 this.postRoot.resolve(Objects.requireNonNull(postDetails.getFileName())));

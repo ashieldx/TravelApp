@@ -10,11 +10,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.TravelApp.entity.Notification;
-import com.TravelApp.entity.Post;
+import com.TravelApp.entity.Place;
 import com.TravelApp.entity.Review;
 import com.TravelApp.entity.User;
 import com.TravelApp.repository.NotificationRepository;
-import com.TravelApp.repository.PostRepository;
+import com.TravelApp.repository.PlaceRepository;
 import com.TravelApp.repository.ReviewRepository;
 import com.TravelApp.repository.UserRepository;
 
@@ -35,7 +35,7 @@ public class NotificationService {
     private NotificationRepository notificationRepository;
 
     @Autowired
-    private PostRepository postRepository;
+    private PlaceRepository postRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -62,7 +62,7 @@ public class NotificationService {
     }
 
     public Notification createReviewNotification(User user, Integer postId){
-        Optional<Post> post = postRepository.findById(postId);
+        Optional<Place> post = postRepository.findById(postId);
         
         if(post.get().getUser().equals(user)){
             return null;

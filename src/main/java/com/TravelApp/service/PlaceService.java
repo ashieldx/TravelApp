@@ -21,25 +21,25 @@ import com.TravelApp.dto.GeolocationRequest;
 import com.TravelApp.dto.PostDto;
 import com.TravelApp.dto.SortDto;
 import com.TravelApp.entity.Claim;
-import com.TravelApp.entity.Post;
-import com.TravelApp.entity.PostDetails;
+import com.TravelApp.entity.Place;
+import com.TravelApp.entity.PlaceDetails;
 import com.TravelApp.entity.Report;
 import com.TravelApp.entity.User;
 import com.TravelApp.repository.ClaimRepository;
-import com.TravelApp.repository.PostDetailRepository;
-import com.TravelApp.repository.PostRepository;
+import com.TravelApp.repository.PlaceDetailRepository;
+import com.TravelApp.repository.PlaceRepository;
 import com.TravelApp.repository.ReportRepository;
 import com.TravelApp.repository.ReviewRepository;
-import com.TravelApp.specification.PostSpecification;
+import com.TravelApp.specification.PlaceSpecification;
 import com.TravelApp.util.ErrorMessage;
 
 @Service
-public class PostService {
+public class PlaceService {
     @Autowired
-    private PostRepository postRepository;
+    private PlaceRepository postRepository;
 
     @Autowired
-    private PostDetailRepository postDetailRepository;
+    private PlaceDetailRepository postDetailRepository;
 
     @Autowired
     private ReviewRepository reviewRepository;
@@ -58,7 +58,7 @@ public class PostService {
 
     private static final String FILE_URL = "uploads/post-details/";
 
-    public Post savePost(User user, Post post, MultipartFile[] files) throws ErrorMessage{
+    public Place savePost(User user, Place post, MultipartFile[] files) throws ErrorMessage{
         if(postRepository.findByTitle(post.getTitle()) != null){
             throw new ErrorMessage("Duplicate Title");
         }
@@ -70,9 +70,9 @@ public class PostService {
         post.setModifiedDate(currentTime);
 
 
-        List<PostDetails> postDetails = new ArrayList<>();
+        List<PlaceDetails> postDetails = new ArrayList<>();
         Arrays.asList(files).stream().forEach(file-> {
-            PostDetails postDetail = new PostDetails();
+            PlaceDetails postDetail = new PlaceDetails();
             postDetail.setOriginalFileName(file.getOriginalFilename());
             postDetail.setFileType(file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".")+1));
             postDetail.setFileName(post.getTitle() + "_" + postDetails.size() + "." + postDetail.getFileType());
@@ -87,8 +87,8 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    public Post editPost(User user, Integer postId, Post newPost, MultipartFile[] files) throws ErrorMessage{
-        Post post = this.findById(postId);
+    public Place editPost(User user, Integer postId, Place newPost, MultipartFile[] files) throws ErrorMessage{
+        Place post = this.findById(postId);
         LocalDateTime currentTime = LocalDateTime.now();
 
         if(!post.getUser().equals(user)){
@@ -113,16 +113,16 @@ public class PostService {
         post.setLongitude(newPost.getLongitude());
 
         //remove old Files
-        List<PostDetails> oldDetails = postDetailRepository.findByPost(post);
-        for(PostDetails i : oldDetails){ 
+        List<PlaceDetails> oldDetails = postDetailRepository.findByPost(post);
+        for(PlaceDetails i : oldDetails){ 
             fileService.deleteFile(FILE_URL+i.getFileName());
         }
         postDetailRepository.deleteAll(oldDetails);
 
         //add new Files
-        List<PostDetails> newPostDetails = new ArrayList<>();
+        List<PlaceDetails> newPostDetails = new ArrayList<>();
         Arrays.asList(files).stream().forEach(file-> {
-            PostDetails postDetail = new PostDetails();
+            PlaceDetails postDetail = new PlaceDetails();
             postDetail.setOriginalFileName(file.getOriginalFilename());
             postDetail.setFileType(file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".")+1));
             postDetail.setFileName(post.getTitle() + "_" + newPostDetails.size() + "." + postDetail.getFileType());
@@ -138,10 +138,10 @@ public class PostService {
     }
 
     //Function to convert Post List -> Post List Dto 
-    public List<PostDto> convertToDto(List<Post> post){
+    public List<PostDto> convertToDto(List<Place> post){
         List<PostDto> postDtoList = new ArrayList<PostDto>();
 
-        for(Post i : post){
+        for(Place i : post){
             float rating = 0, rounded = 0;
             Integer totalRating = reviewRepository.getPostTotalRating(i.getId());
             Integer totalRatingThisMonth = reviewRepository.getPostTotalRatingThisMonth(i.getId());
@@ -172,7 +172,7 @@ public class PostService {
     }
 
     public Page<PostDto> search(SortDto sortDto, String sortBy, String sortDir, int page, int size){
-        List<Post> posts = postRepository.findAll(PostSpecification.findBySpecification(sortDto));
+        List<Place> posts = postRepository.findAll(PlaceSpecification.findBySpecification(sortDto));
 
         List<PostDto> postDtoList = convertToDto(posts);
 
@@ -228,8 +228,8 @@ public class PostService {
         return new PageImpl<>(subList, PageRequest.of(page,size), postDtoList.size());
     }
 
-    public Post findById(Integer id) throws ErrorMessage{
-        Optional<Post> post = postRepository.findById(id);
+    public Place findById(Integer id) throws ErrorMessage{
+        Optional<Place> post = postRepository.findById(id);
         if(post.isPresent()){
             return post.get();
         }
@@ -257,12 +257,12 @@ public class PostService {
     }
 
     public List<PostDto> getAllPostsDto(){
-        List<Post> posts = postRepository.findAll();
+        List<Place> posts = postRepository.findAll();
         return convertToDto(posts);
     }
 
     public Page<PostDto> getPostByUser(User user, Pageable pageable){
-        Page<Post> posts = postRepository.findByUser(user, pageable);
+        Page<Place> posts = postRepository.findByUser(user, pageable);
         List<PostDto> postDtoList = convertToDto(posts.toList());
 
         int page = pageable.getPageNumber();
@@ -281,9 +281,9 @@ public class PostService {
 
     public List<Resource> getFiles(Integer postId){
         List<Resource> resources = new ArrayList<>();
-        Optional<Post> post = postRepository.findById(postId);
+        Optional<Place> post = postRepository.findById(postId);
         if(post.isPresent()){
-            for(PostDetails postDetails : post.get().getPostDetails()){
+            for(PlaceDetails postDetails : post.get().getPostDetails()){
                 resources.add(fileService.getFileByName(postDetails.getFileName(), postDetails.getUrl()));
             }
         }
@@ -291,7 +291,7 @@ public class PostService {
     }
 
     public Boolean deletePost(User user, Integer postId) throws ErrorMessage{
-        Post post = this.findById(postId);
+        Place post = this.findById(postId);
 
         if(post.getUser().equals(user)){
 
@@ -304,8 +304,8 @@ public class PostService {
             reportRepository.deleteAll(reports);
 
             //delete details
-            List<PostDetails> postDetails = postDetailRepository.findByPost(post);
-            for(PostDetails i : postDetails){
+            List<PlaceDetails> postDetails = postDetailRepository.findByPost(post);
+            for(PlaceDetails i : postDetails){
                 fileService.deleteFile(FILE_URL+i.getFileName());
             }
             postDetailRepository.deleteAll(postDetails);
@@ -318,7 +318,7 @@ public class PostService {
         throw new ErrorMessage("Post Belongs To Another User");
     }
 
-    public Post claimPost(User user, Post post){
+    public Place claimPost(User user, Place post){
         post.setUser(user);
         post.setVerified(true);
         post.setModifiedDate(LocalDateTime.now());
@@ -329,7 +329,7 @@ public class PostService {
     //ADMIN ONLY
     public void deletePostByAdmin(Integer id) throws ErrorMessage{
         //send Notification to user
-        Post post = postRepository.findById(id).get();
+        Place post = postRepository.findById(id).get();
         if(post != null){
             deletePost(post.getUser(), id);
             return;

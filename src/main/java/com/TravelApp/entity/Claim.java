@@ -54,7 +54,7 @@ public class Claim {
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Post post;
+    private Place post;
     
     
 }

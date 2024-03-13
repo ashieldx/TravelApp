@@ -23,7 +23,7 @@ public class UserService {
     private FileService fileService;
 
     @Autowired
-    private PostService postService;
+    private PlaceService postService;
     
 
     public User saveUser(User user){
@@ -42,7 +42,9 @@ public class UserService {
 
         String filename = null;
         if(file != null){
-            fileService.deleteFile(user.getProfileUrl());
+            if(!user.getProfileUrl().equals("default.jpg")){
+                fileService.deleteFile(user.getProfileUrl());
+            }
             filename = fileService.save(file, user.getUsername());
         }
 

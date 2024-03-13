@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.TravelApp.entity.Post;
+import com.TravelApp.entity.Place;
 import com.TravelApp.entity.Report;
 import com.TravelApp.entity.User;
 import com.TravelApp.repository.ReportRepository;
@@ -17,7 +17,7 @@ import com.TravelApp.util.ErrorMessage;
 public class ReportService {
 
     @Autowired
-    private PostService postService;
+    private PlaceService postService;
 
     @Autowired
     private ReportRepository reportRepository;
@@ -29,7 +29,7 @@ public class ReportService {
 
     public Report createReport(User user, Integer postId, String message, String type) throws ErrorMessage{
         Report report = new Report();
-        Post post  = postService.findById(postId);
+        Place post  = postService.findById(postId);
         
         report.setSenderId(user.getId());
         report.setPost(post);

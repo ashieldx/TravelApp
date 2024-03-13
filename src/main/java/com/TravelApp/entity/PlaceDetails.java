@@ -17,7 +17,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "mst_post_details")
-public class PostDetails {  
+public class PlaceDetails {  
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -25,7 +25,7 @@ public class PostDetails {
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
+    private Place post;
 
     @Column(name = "renamed_file_name")
     private String fileName;

@@ -31,7 +31,7 @@ public class Report {
     private Integer senderId;
 
     @ManyToOne
-    private Post post;
+    private Place post;
 
     @Lob
     @Column(name = "message", columnDefinition = "LONGTEXT")

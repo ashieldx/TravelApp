@@ -22,14 +22,14 @@ import com.TravelApp.dto.PostDto;
 import com.TravelApp.dto.ReportDto;
 import com.TravelApp.dto.SortDto;
 import com.TravelApp.entity.Claim;
-import com.TravelApp.entity.Post;
+import com.TravelApp.entity.Place;
 import com.TravelApp.entity.Report;
 import com.TravelApp.entity.User;
 import com.TravelApp.response.CommonResponse;
 import com.TravelApp.response.CommonResponseGenerator;
 import com.TravelApp.service.ClaimService;
 import com.TravelApp.service.FileService;
-import com.TravelApp.service.PostService;
+import com.TravelApp.service.PlaceService;
 import com.TravelApp.service.ReportService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -37,10 +37,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping("/post")
-public class PostController {
+public class PlaceController {
 
     @Autowired
-    private PostService postService;
+    private PlaceService placeService;
 
     @Autowired
     private ReportService reportService;
@@ -56,13 +56,13 @@ public class PostController {
 
     // Post Entity
     @PostMapping("/create")
-    public CommonResponse<Post> createPost(@AuthenticationPrincipal User user, @RequestParam("files") MultipartFile[] files,
+    public CommonResponse<Place> createPost(@AuthenticationPrincipal User user, @RequestParam("files") MultipartFile[] files,
         @RequestParam("data") String postString) throws JsonMappingException, JsonProcessingException{
-        Post post = new ObjectMapper().readValue(postString, Post.class);
-        Post postResponse = null;
+        Place post = new ObjectMapper().readValue(postString, Place.class);
+        Place postResponse = null;
         try{
             fileService.validateFiles(files);
-            postResponse = postService.savePost(user, post, files);
+            postResponse = placeService.savePost(user, post, files);
         } catch(Exception e){
             return commonResponseGenerator.errorResponse(null, e.getMessage());
         }
@@ -96,13 +96,13 @@ public class PostController {
     }
 
     @PutMapping("/edit/{id}")
-    public CommonResponse<Post> editPost(@AuthenticationPrincipal User user, @RequestParam("files") MultipartFile[] files,
+    public CommonResponse<Place> editPost(@AuthenticationPrincipal User user, @RequestParam("files") MultipartFile[] files,
          @PathVariable("id") Integer id, @RequestParam("data") String postString) throws JsonMappingException, JsonProcessingException{
-        Post post = new ObjectMapper().readValue(postString, Post.class);
-        Post postResponse = null;
+        Place post = new ObjectMapper().readValue(postString, Place.class);
+        Place postResponse = null;
         try{
             fileService.validateFiles(files);
-            postResponse = postService.editPost(user, id, post, files);
+            postResponse = placeService.editPost(user, id, post, files);
         }catch (Exception e){
             return commonResponseGenerator.errorResponse(null, e.getMessage());
         }
@@ -112,7 +112,7 @@ public class PostController {
     @DeleteMapping("/delete/{id}")
     public CommonResponse<String> deletePost(@AuthenticationPrincipal User user, @PathVariable("id") Integer id){
         try{
-            postService.deletePost(user, id);
+            placeService.deletePost(user, id);
         } catch(Exception e){
             return commonResponseGenerator.errorResponse(null, e.getMessage());
         }
@@ -120,10 +120,10 @@ public class PostController {
     }
 
     @GetMapping("/get/{id}")
-    public CommonResponse<Post> getPostById(@PathVariable("id") Integer id){
-        Post postResponse = null;
+    public CommonResponse<Place> getPostById(@PathVariable("id") Integer id){
+        Place postResponse = null;
         try{
-            postResponse = postService.findById(id);
+            postResponse = placeService.findById(id);
         } catch(Exception e){
             return commonResponseGenerator.errorResponse(null, e.getMessage());
         }
@@ -135,7 +135,7 @@ public class PostController {
 
         List<PostDto> postResponse = null;
         try{
-            postResponse = postService.getAllPostsDto();
+            postResponse = placeService.getAllPostsDto();
         }catch(Exception e){
             return commonResponseGenerator.errorResponse(null, e.getMessage());
         }
@@ -147,7 +147,7 @@ public class PostController {
         @RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "10") int size){
         Page<PostDto> postResponse = null;
         try{      
-            postResponse = postService.search(sortDto, sortBy, sortDir, page, size);
+            postResponse = placeService.search(sortDto, sortBy, sortDir, page, size);
         }catch (Exception e){
             return commonResponseGenerator.errorResponse(null, "Search By Criteria Error");
         }
@@ -159,7 +159,7 @@ public class PostController {
     public CommonResponse<List<PostDto>> findNearest(@AuthenticationPrincipal User user, @RequestBody GeolocationRequest geolocationRequest){
         List<PostDto> postResponse = null;
         try{
-            postResponse = postService.findNearest(user, geolocationRequest);
+            postResponse = placeService.findNearest(user, geolocationRequest);
         }catch(Exception e){
             return commonResponseGenerator.errorResponse(null, "Failed to Find Nearest Place");
         }
@@ -173,7 +173,7 @@ public class PostController {
         int actualLimit = limit.orElse(8);
         List<PostDto> postResponse = null;
         try{
-            postResponse = postService.getMostRatingThisMonth(actualLimit);
+            postResponse = placeService.getMostRatingThisMonth(actualLimit);
         }catch(Exception e){
             return commonResponseGenerator.errorResponse(null, e.getMessage());
         }
@@ -183,7 +183,7 @@ public class PostController {
     @DeleteMapping("/admin/delete/{id}")
     public CommonResponse<String> deletePost(@PathVariable("id") Integer id){
         try{
-            postService.deletePostByAdmin(id);
+            placeService.deletePostByAdmin(id);
         }catch(Exception e){
             return commonResponseGenerator.errorResponse(null, e.getMessage());
         }

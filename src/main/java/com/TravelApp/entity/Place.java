@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "mst_post")
-public class Post {
+public class Place {
     @Id
     @GeneratedValue(strategy =  GenerationType.IDENTITY)
     private Integer id;
@@ -86,7 +86,7 @@ public class Post {
     private boolean verified;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    private List<PostDetails> postDetails = new ArrayList<PostDetails>();
+    private List<PlaceDetails> postDetails = new ArrayList<PlaceDetails>();
 
     @ManyToOne
     private Category category;
